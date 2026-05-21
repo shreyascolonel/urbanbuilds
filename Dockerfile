@@ -16,12 +16,12 @@ COPY projects.json ./
 COPY hero.json ./
 COPY public/ ./public/
 
-# Inform Docker that our Express web application listens on port 8080
-EXPOSE 8080
+# Inform Docker that our Express web application listens on port 3000
+EXPOSE 3000
 
 # Environment variables configuration
 ENV NODE_ENV=production
-ENV PORT=8080
+ENV PORT=3000
 
 # Boot Express platform server inside the container
 CMD ["node", "server.js"]
