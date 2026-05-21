@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  urban-builds-platform:
+    container_name: urban-builds-platform
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Maps port 8080 on host/NAS to port 8080 inside container
+    volumes:
+      # Persistent JSON file volume bindings to preserve project listings and hero data
+      - ./projects.json:/usr/src/app/projects.json
+      - ./hero.json:/usr/src/app/hero.json
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

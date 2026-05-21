@@ -1,0 +1,308 @@
+[
+  {
+    "id": "p1",
+    "title": "The Courtyard House",
+    "category": "Design Tours",
+    "architect": "Studio Space & Form",
+    "location": "Bangalore, Karnataka",
+    "budget": "₹1.8 Crores",
+    "budgetRange": "1cr-2cr",
+    "area": "3,800 sq ft",
+    "areaRange": "3000-5000",
+    "style": "Modern Minimalist",
+    "heroImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "4 BHK",
+      "orientation": "East Facing",
+      "costBreakdown": "₹1.4 Cr Structure + ₹40 Lakhs Interiors",
+      "year": "2024",
+      "description": "Designed around a central open-to-sky double-height courtyard, this home blends outdoor elements with internal spaces. The clean lines, natural light, and organic wooden textures create an oasis of calm within the busy urban environment. The home features passive cooling systems and green architectural techniques."
+    },
+    "materials": [
+      { "category": "Flooring", "brand": "Nexion", "material": "Italian Marble Finish Vitrified Tiles" },
+      { "category": "Lighting", "brand": "Philips Hue / Osram", "material": "Smart Architectural Dimmable LEDs" },
+      { "category": "Kitchen Hardware", "brand": "Blum / Hettich", "material": "Seamless Soft-close Pull-outs" },
+      { "category": "Bathroom Fittings", "brand": "Kohler / Grohe", "material": "Matte Black Premium Series" },
+      { "category": "Furniture & Decor", "brand": "Custom Made", "material": "Teak Wood & Handwoven Rattan" }
+    ],
+    "floorPlan": "\n      <svg viewBox=\"0 0 800 500\" class=\"vector-floor-plan\">\n        <style>\n          .wall { stroke: var(--text-color); stroke-width: 5; fill: none; stroke-linecap: round; }\n          .thin-wall { stroke: var(--text-color); stroke-width: 2.5; fill: none; opacity: 0.7; }\n          .door { stroke: var(--primary-color); stroke-width: 2.5; fill: none; }\n          .room-label { fill: var(--text-color); font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; text-anchor: middle; }\n          .room-dims { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 11px; text-anchor: middle; }\n          .furniture { fill: rgba(255, 149, 0, 0.08); stroke: rgba(255, 149, 0, 0.4); stroke-width: 1.5; }\n        </style>\n        <!-- Outer Wall Boundary -->\n        <rect x=\"50\" y=\"50\" width=\"700\" height=\"400\" rx=\"10\" class=\"wall\" />\n        \n        <!-- Room Dividers -->\n        <!-- Courtyard in Center -->\n        <rect x=\"300\" y=\"150\" width=\"200\" height=\"200\" rx=\"8\" class=\"wall\" style=\"stroke-dasharray: 8 5; fill: rgba(0,0,0,0.03);\" />\n        \n        <!-- Living Room Left -->\n        <line x1=\"300\" y1=\"50\" x2=\"300\" y2=\"350\" class=\"wall\" />\n        <!-- Master Bedroom Right -->\n        <line x1=\"500\" y1=\"50\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <!-- Kitchen Bottom -->\n        <line x1=\"300\" y1=\"350\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <line x1=\"400\" y1=\"350\" x2=\"400\" y2=\"450\" class=\"wall\" />\n        \n        <!-- Furniture Blocks -->\n        <!-- Sofa in Living -->\n        <rect x=\"80\" y=\"150\" width=\"40\" height=\"120\" rx=\"4\" class=\"furniture\" />\n        <rect x=\"130\" y=\"190\" width=\"80\" height=\"40\" rx=\"4\" class=\"furniture\" />\n        \n        <!-- Bed in Master Bed -->\n        <rect x=\"580\" y=\"120\" width=\"120\" height=\"100\" rx=\"6\" class=\"furniture\" />\n        \n        <!-- Dining Table in Courtyard -->\n        <rect x=\"360\" y=\"220\" width=\"80\" height=\"60\" rx=\"4\" class=\"furniture\" />\n        <circle cx=\"345\" cy=\"250\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"455\" cy=\"250\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"400\" cy=\"205\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"400\" cy=\"295\" r=\"8\" class=\"furniture\" />\n        \n        <!-- Doors -->\n        <!-- Main Entry -->\n        <path d=\"M 50 400 A 50 50 0 0 1 100 450\" class=\"door\" />\n        <!-- Bedroom Entry -->\n        <path d=\"M 500 300 A 40 40 0 0 1 540 340\" class=\"door\" />\n        \n        <!-- Labels -->\n        <text x=\"175\" y=\"200\" class=\"room-label\">LIVING ROOM</text>\n        <text x=\"175\" y=\"220\" class=\"room-dims\">16'0\" x 24'0\"</text>\n        \n        <text x=\"400\" y=\"180\" class=\"room-label\" style=\"fill: var(--primary-color);\">COURTYARD</text>\n        <text x=\"400\" y=\"198\" class=\"room-dims\" style=\"fill: var(--primary-color);\">12'0\" x 12'0\" (Open to Sky)</text>\n        \n        <text x=\"625\" y=\"200\" class=\"room-label\">MASTER BEDROOM</text>\n        <text x=\"625\" y=\"220\" class=\"room-dims\">18'0\" x 14'0\"</text>\n        \n        <text x=\"350\" y=\"400\" class=\"room-label\">KITCHEN</text>\n        <text x=\"350\" y=\"418\" class=\"room-dims\">10'0\" x 12'0\"</text>\n        \n        <text x=\"450\" y=\"400\" class=\"room-label\">FOYER</text>\n        <text x=\"450\" y=\"418\" class=\"room-dims\">8'0\" x 12'0\"</text>\n      </svg>\n    "
+  },
+  {
+    "id": "p2",
+    "title": "The Emerald Penthouse",
+    "category": "Design Tours",
+    "architect": "Vanguard Design Lab",
+    "location": "Mumbai, Maharashtra",
+    "budget": "₹3.5 Crores",
+    "budgetRange": "2cr+",
+    "area": "4,600 sq ft",
+    "areaRange": "3000-5000",
+    "style": "Contemporary Luxury",
+    "heroImage": "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-living-room-with-elegant-furniture-39937-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1556912173-3bb406ef7e77?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "5 BHK Penthouse",
+      "orientation": "West Facing (Sea View)",
+      "costBreakdown": "₹2.2 Cr Structure + ₹1.3 Cr Interiors & Art",
+      "year": "2025",
+      "description": "A luxury high-rise apartment overlooking the Arabian Sea, themed around Emerald Green, Brass, and rich Walnut woods. The architecture features wide floor-to-ceiling glass fronts, custom crafted metal screens, and statement lighting pieces. An private plunge pool and bar section makes it the ultimate entertainment lounge."
+    },
+    "materials": [
+      { "category": "Flooring", "brand": "Sicila", "material": "High-gloss Statuario Italian Marble" },
+      { "category": "Lighting", "brand": "Flos / Tom Dixon", "material": "Brass Pendant & Magnetic Track System" },
+      { "category": "Veneer & Millwork", "brand": "DecoWood", "material": "Fumed Walnut Premium Matte Finish" },
+      { "category": "Automation", "brand": "Lutron", "material": "Whole-home Automated Scenario Control" },
+      { "category": "Plumbing Fittings", "brand": "Gessi", "material": "Brushed Gold Custom Series" }
+    ],
+    "floorPlan": "\n      <svg viewBox=\"0 0 800 500\" class=\"vector-floor-plan\">\n        <rect x=\"50\" y=\"50\" width=\"700\" height=\"400\" rx=\"10\" class=\"wall\" />\n        <!-- Room Dividers -->\n        <line x1=\"400\" y1=\"50\" x2=\"400\" y2=\"450\" class=\"wall\" />\n        <line x1=\"400\" y1=\"250\" x2=\"750\" y2=\"250\" class=\"wall\" />\n        <line x1=\"50\" y1=\"200\" x2=\"400\" y2=\"200\" class=\"wall\" />\n        \n        <!-- Balcony Deck Bottom -->\n        <rect x=\"50\" y=\"50\" width=\"350\" height=\"60\" style=\"fill: rgba(255, 149, 0, 0.05); stroke: var(--text-color); stroke-width: 1.5; stroke-dasharray: 4 4;\" />\n        \n        <!-- Text Labels -->\n        <text x=\"225\" y=\"150\" class=\"room-label\">SEA-VIEW LIVING DECK</text>\n        <text x=\"225\" y=\"170\" class=\"room-dims\">22'0\" x 30'0\"</text>\n        \n        <text x=\"225\" y=\"320\" class=\"room-label\">LOUNGE & COCKTAIL BAR</text>\n        <text x=\"225\" y=\"340\" class=\"room-dims\">22'0\" x 16'0\"</text>\n        \n        <text x=\"575\" y=\"150\" class=\"room-label\">MASTER SUITE</text>\n        <text x=\"575\" y=\"170\" class=\"room-dims\">18'0\" x 18'0\"</text>\n        \n        <text x=\"575\" y=\"350\" class=\"room-label\">GUEST SUITE & SPA BATH</text>\n        <text x=\"575\" y=\"370\" class=\"room-dims\">18'0\" x 16'0\"</text>\n        \n        <!-- Furniture Mock -->\n        <rect x=\"500\" y=\"100\" width=\"100\" height=\"90\" rx=\"4\" class=\"furniture\" />\n        <circle cx=\"225\" cy=\"300\" r=\"30\" class=\"furniture\" />\n      </svg>\n    "
+  },
+  {
+    "id": "p3",
+    "title": "The Terracotta Villa",
+    "category": "Design Tours",
+    "architect": "Earth & Wood Architects",
+    "location": "Alibaug, Maharashtra",
+    "budget": "₹95 Lakhs",
+    "budgetRange": "under-1cr",
+    "area": "2,200 sq ft",
+    "areaRange": "1500-3000",
+    "style": "Traditional Vernacular",
+    "heroImage": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-interior-design-with-natural-plants-39934-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1615874959474-d609969a20ed?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "3 BHK Country Home",
+      "orientation": "North-East Facing",
+      "costBreakdown": "₹70 Lakhs Clay-brick Structure + ₹25 Lakhs Custom Millwork",
+      "year": "2023",
+      "description": "An eco-conscious countryside retreat crafted using locally sourced exposed red clay bricks, terracotta tile roofing, and reclaimed teak wood. Designed around the concept of passive ventilation, the high sloping ceilings and large louvers keep the interior cool, eliminating the need for intensive air conditioning."
+    },
+    "materials": [
+      { "category": "Flooring", "brand": "Local Artisans", "material": "Hand-polished Athangudi Floral Clay Tiles" },
+      { "category": "Roofing", "brand": "Mangalore Tiles", "material": "Natural Baked Terracotta Interlocking Tiles" },
+      { "category": "Paints & Finish", "brand": "Lime & Clay", "material": "Breathable Eco-Lime Wash Textured Finish" },
+      { "category": "Bathroom Fixtures", "brand": "Jaquar Artize", "material": "Antique Bronze Dual Flow Faucets" },
+      { "category": "Doors & Windows", "brand": "Reclaimed Wood", "material": "Reused Old Colonial Mansion Teak Shutters" }
+    ],
+    "floorPlan": "\n      <svg viewBox=\"0 0 800 500\" class=\"vector-floor-plan\">\n        <rect x=\"50\" y=\"50\" width=\"700\" height=\"400\" rx=\"10\" class=\"wall\" />\n        <!-- Traditional Verandah in front -->\n        <rect x=\"50\" y=\"320\" width=\"700\" height=\"130\" style=\"fill: rgba(230, 92, 0, 0.05); stroke: var(--text-color); stroke-width: 1.5; stroke-dasharray: 4 4;\" />\n        \n        <line x1=\"250\" y1=\"50\" x2=\"250\" y2=\"320\" class=\"wall\" />\n        <line x1=\"550\" y1=\"50\" x2=\"550\" y2=\"320\" class=\"wall\" />\n        <line x1=\"250\" y1=\"180\" x2=\"550\" y2=\"180\" class=\"wall\" />\n        \n        <!-- Pillars -->\n        <circle cx=\"100\" cy=\"400\" r=\"8\" fill=\"var(--primary-color)\" />\n        <circle cx=\"300\" cy=\"400\" r=\"8\" fill=\"var(--primary-color)\" />\n        <circle cx=\"500\" cy=\"400\" r=\"8\" fill=\"var(--primary-color)\" />\n        <circle cx=\"700\" cy=\"400\" r=\"8\" fill=\"var(--primary-color)\" />\n        \n        <!-- Text Labels -->\n        <text x=\"400\" y=\"120\" class=\"room-label\">CENTRAL LIVING HALL</text>\n        <text x=\"400\" y=\"140\" class=\"room-dims\">20'0\" x 14'0\"</text>\n        \n        <text x=\"400\" y=\"250\" class=\"room-label\">OPEN ETHNIC KITCHEN</text>\n        <text x=\"400\" y=\"270\" class=\"room-dims\">20'0\" x 12'0\"</text>\n        \n        <text x=\"150\" y=\"180\" class=\"room-label\">BEDROOM 1</text>\n        <text x=\"150\" y=\"200\" class=\"room-dims\">12'0\" x 18'0\"</text>\n        \n        <text x=\"650\" y=\"180\" class=\"room-label\">BEDROOM 2</text>\n        <text x=\"650\" y=\"200\" class=\"room-dims\">12'0\" x 18'0\"</text>\n        \n        <text x=\"400\" y=\"380\" class=\"room-label\" style=\"fill: var(--primary-color);\">TRADITIONAL FRONT VERANDAH</text>\n        <text x=\"400\" y=\"400\" class=\"room-dims\" style=\"fill: var(--primary-color);\">50'0\" x 10'0\"</text>\n      </svg>\n    "
+  },
+  {
+    "id": "p4",
+    "title": "The Slate Studio",
+    "category": "Design Tours",
+    "architect": "Metropolitan Design Co.",
+    "location": "Gurugram, Haryana",
+    "budget": "₹65 Lakhs",
+    "budgetRange": "under-1cr",
+    "area": "1,450 sq ft",
+    "areaRange": "under-1500",
+    "style": "Industrial Loft",
+    "heroImage": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-bright-kitchen-in-a-minimalist-home-39939-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "2 BHK Studio Loft",
+      "orientation": "South Facing",
+      "costBreakdown": "₹35 Lakhs Civil modifications + ₹30 Lakhs Premium Fitouts",
+      "year": "2024",
+      "description": "An industrial loft featuring raw concrete ceilings, exposed black metal conduits, micro-concrete floors, and hand-rubbed leather upholstery. Double height metal framing partition panels create visual boundaries without compromising on the expansive, open sense of space."
+    },
+    "materials": [
+      { "category": "Flooring", "brand": "Concretere", "material": "Seamless Polyurethane Micro-concrete Slate Grey" },
+      { "category": "Partitions", "brand": "Custom Ironwork", "material": "Black Powder-Coated MS Pipes with Fluted Glass" },
+      { "category": "Furniture Accent", "brand": "Stanley Leather", "material": "Cognac Tan Italian Grain Leather Chesterfield Sofa" },
+      { "category": "Switchboard", "brand": "Norisys", "material": "Sleek Carbon Metallic Toggle Switches" },
+      { "category": "Wall Finish", "brand": "Asian Paints", "material": "Raw Stucco Concrete Texturing" }
+    ],
+    "floorPlan": "\n      <svg viewBox=\"0 0 800 500\" class=\"vector-floor-plan\">\n        <rect x=\"50\" y=\"50\" width=\"700\" height=\"400\" rx=\"10\" class=\"wall\" />\n        \n        <line x1=\"500\" y1=\"50\" x2=\"500\" y2=\"450\" class=\"wall\" />\n        <line x1=\"50\" y1=\"250\" x2=\"500\" y2=\"250\" class=\"wall\" />\n        \n        <!-- Text Labels -->\n        <text x=\"275\" y=\"150\" class=\"room-label\">OPEN CONCEPT STUDIO LIVING</text>\n        <text x=\"275\" y=\"170\" class=\"room-dims\">26'0\" x 16'0\"</text>\n        \n        <text x=\"275\" y=\"350\" class=\"room-label\">INTEGRATED DINING & PANTRY</text>\n        <text x=\"275\" y=\"370\" class=\"room-dims\">26'0\" x 16'0\"</text>\n        \n        <text x=\"625\" y=\"250\" class=\"room-label\">LOFT BED & DRESSER</text>\n        <text x=\"625\" y=\"270\" class=\"room-dims\">14'0\" x 30'0\"</text>\n      </svg>\n    "
+  },
+  {
+    "id": "p5",
+    "title": "Natural Scandi Specification Board",
+    "category": "Material Boards",
+    "architect": "Hygge Design House",
+    "location": "Kochi, Kerala",
+    "budget": "₹45 Lakhs",
+    "budgetRange": "under-1cr",
+    "area": "1,800 sq ft",
+    "areaRange": "1500-3000",
+    "style": "Modern Minimalist",
+    "heroImage": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-bright-kitchen-in-a-minimalist-home-39939-large.mp4",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-bright-kitchen-in-a-minimalist-home-39939-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "3 BHK Interior Material board",
+      "orientation": "North Facing",
+      "costBreakdown": "₹45 Lakhs complete internal joinery, panelling, and soft finishes",
+      "year": "2025",
+      "description": "An interactive board detailing modern Scandinavian styles. Clean lines, light oak millwork, neutral linen textures, and warm custom lighting elements provide an elegant template for modern coastal residential apartments."
+    },
+    "materials": [
+      { "category": "Wooden Finishes", "brand": "Euro Oak", "material": "Matte PU Coated Natural White Oak Veneer" },
+      { "category": "Fabrics", "brand": "Kvadrat", "material": "Warm Bouclé Sand Textures" },
+      { "category": "Paints & Plasters", "brand": "Novacolor", "material": "Travertino Roman Style Lime Plaster Cream" }
+    ]
+  },
+  {
+    "id": "p6",
+    "title": "The Courtyard Blueprint Design",
+    "category": "Floor Plans",
+    "architect": "Studio Space & Form",
+    "location": "Bangalore, Karnataka",
+    "budget": "₹1.8 Crores",
+    "budgetRange": "1cr-2cr",
+    "area": "3,800 sq ft",
+    "areaRange": "3000-5000",
+    "style": "Modern Minimalist",
+    "heroImage": "https://images.unsplash.com/photo-1506974210756-8e1b8985d348?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1506974210756-8e1b8985d348?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "4 BHK Layout Blueprint",
+      "orientation": "East Facing",
+      "costBreakdown": "Vector Architectural Blueprint specification layout document",
+      "year": "2024",
+      "description": "Premium open-to-sky courtyard architectural plans, illustrating partition structures, load-bearing concrete layouts, ventilation louvers, and interior furniture placements mapped for maximum daylight penetration."
+    },
+    "materials": [
+      { "category": "Architectural Blueprint", "brand": "AutoCAD / Revit", "material": "Vector Blueprint Layout File" }
+    ],
+    "floorPlan": "\n      <svg viewBox=\"0 0 800 500\" class=\"vector-floor-plan\">\n        <style>\n          .wall { stroke: var(--text-color); stroke-width: 5; fill: none; stroke-linecap: round; }\n          .thin-wall { stroke: var(--text-color); stroke-width: 2.5; fill: none; opacity: 0.7; }\n          .door { stroke: var(--primary-color); stroke-width: 2.5; fill: none; }\n          .room-label { fill: var(--text-color); font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; text-anchor: middle; }\n          .room-dims { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 11px; text-anchor: middle; }\n          .furniture { fill: rgba(255, 149, 0, 0.08); stroke: rgba(255, 149, 0, 0.4); stroke-width: 1.5; }\n        </style>\n        <rect x=\"50\" y=\"50\" width=\"700\" height=\"400\" rx=\"10\" class=\"wall\" />\n        <rect x=\"300\" y=\"150\" width=\"200\" height=\"200\" rx=\"8\" class=\"wall\" style=\"stroke-dasharray: 8 5; fill: rgba(0,0,0,0.03);\" />\n        <line x1=\"300\" y1=\"50\" x2=\"300\" y2=\"350\" class=\"wall\" />\n        <line x1=\"500\" y1=\"50\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <line x1=\"300\" y1=\"350\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <text x=\"175\" y=\"200\" class=\"room-label\">LIVING ROOM</text>\n        <text x=\"400\" y=\"180\" class=\"room-label\" style=\"fill: var(--primary-color);\">COURTYARD</text>\n        <text x=\"625\" y=\"200\" class=\"room-label\">MASTER SUITE</text>\n      </svg>\n    "
+  },
+  {
+    "id": "p7",
+    "title": "Minimalist Japandi Styling Guide",
+    "category": "Design Style",
+    "architect": "Zen Spaces Studio",
+    "location": "Chennai, Tamil Nadu",
+    "budget": "₹55 Lakhs",
+    "budgetRange": "under-1cr",
+    "area": "1,600 sq ft",
+    "areaRange": "1500-3000",
+    "style": "Modern Minimalist",
+    "heroImage": "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "3 BHK Style Showcase",
+      "orientation": "East Facing",
+      "costBreakdown": "₹55 Lakhs Styling, Bespoke Furniture & Lighting selection",
+      "year": "2025",
+      "description": "Japandi interior styling fusing clean Japanese minimalism with warm Scandinavian functionality. Raw paper pendant lamps, low-slung oak bed structures, light beige textures, and hand-woven tatami rugs define this beautiful styling template."
+    },
+    "materials": [
+      { "category": "Styling Accessories", "brand": "Zen Custom", "material": "Wabi-Sabi Organic Ceramic Urns" },
+      { "category": "Lighting", "brand": "Isamu Noguchi", "material": "Akari Washi Paper Floor and Pendant Lamps" }
+    ]
+  },
+  {
+    "id": "p8",
+    "title": "The Smart Sanctuary Integration",
+    "category": "Automation",
+    "architect": "Cybertecture Labs",
+    "location": "Hyderabad, Telangana",
+    "budget": "₹1.5 Crores",
+    "budgetRange": "1cr-2cr",
+    "area": "3,400 sq ft",
+    "areaRange": "3000-5000",
+    "style": "Contemporary Luxury",
+    "heroImage": "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-living-room-with-elegant-furniture-39937-large.mp4",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-living-room-with-elegant-furniture-39937-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "4 BHK Smart Home",
+      "orientation": "West Facing",
+      "costBreakdown": "₹1.1 Cr Civil Structure + ₹40 Lakhs Whole-Home Smart Automation",
+      "year": "2026",
+      "description": "An ultra-modern automated home featuring voice-controlled smart glass partition panels, Lutron architectural lighting scenario controls, motorized hidden drapery tracks, smart HVAC systems, and dynamic solar shades."
+    },
+    "materials": [
+      { "category": "Home Automation", "brand": "Lutron Palladiom", "material": "Keypads and Automated Lighting Scene Controller" },
+      { "category": "Smart Glass", "brand": "Saint-Gobain Priva-Lite", "material": "Switchable Electrochromic Privacy Glazing" },
+      { "category": "Smart Speakers", "brand": "Sonos Architectural", "material": "In-wall flush mount acoustic audio drivers" }
+    ]
+  },
+  {
+    "id": "p9",
+    "title": "UB Magazines: Monsoon Issue 2026",
+    "category": "UB Magazines",
+    "architect": "Urban Builds Editorial",
+    "location": "Goa",
+    "budget": "₹2.2 Crores",
+    "budgetRange": "2cr+",
+    "area": "4,100 sq ft",
+    "areaRange": "3000-5000",
+    "style": "Contemporary Luxury",
+    "heroImage": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1600&q=80",
+    "videoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-interior-design-with-natural-plants-39934-large.mp4",
+    "videoSrcType": "mock",
+    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-interior-design-with-natural-plants-39934-large.mp4",
+    "gallery": [
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"
+    ],
+    "details": {
+      "bhk": "Editorial Residential Spread",
+      "orientation": "Sea Facing",
+      "costBreakdown": "Full coverage of modern tropical coastal architecture",
+      "year": "2026",
+      "description": "Featured spread for the Monsoon 2026 issue of Urban Builds Magazine. Spotlighting a seaside villa in Goa with concrete cantilevers, rich local hardwood decks, and dynamic floor-to-ceiling glass sliding bays."
+    },
+    "materials": [
+      { "category": " हार्डवेयर / Finishes", "brand": "Local Goan Hardwoods", "material": "Reclaimed Teak decking boards oiled matte" },
+      { "category": "Glass Systems", "brand": "Schüco", "material": "High-performance slim-line sliding glass structures" }
+    ]
+  }
+]

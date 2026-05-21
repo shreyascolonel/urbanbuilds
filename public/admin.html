@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Builds | Admin Dashboard Portal</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Premium Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="admin-body">
+
+  <!-- Notification Toast -->
+  <div id="toast-notification" class="toast-notification"></div>
+
+  <!-- 1. FULLSCREEN ADMIN AUTHENTICATION CARD (Default View) -->
+  <div class="admin-auth-screen" id="admin-auth-screen">
+    <div class="auth-card glassmorphism">
+      <div class="auth-header">
+        <img src="assets/logo.png" alt="Urban Builds Logo" class="auth-brand-logo">
+        <div style="margin-bottom: 12px;">
+          <span class="auth-badge">ADMIN ACCESS PORTAL</span>
+        </div>
+        <p>Provide verified administrator credentials to unlock project list and hero management tools.</p>
+      </div>
+
+      <form id="admin-login-form" onsubmit="admin.handleLogin(event)">
+        <div class="form-group">
+          <label for="login-username">Administrator Username</label>
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-user-shield input-field-icon"></i>
+            <input type="text" id="login-username" required placeholder="e.g. admin">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="login-password">Security Password</label>
+          <div class="input-icon-wrapper">
+            <i class="fa-solid fa-key input-field-icon"></i>
+            <input type="password" id="login-password" required placeholder="••••••••">
+          </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-block margin-top-md"><i class="fa-solid fa-arrow-right-to-bracket"></i> Authenticate Dashboard</button>
+        <a href="/" class="btn btn-outline btn-block margin-top-sm"><i class="fa-solid fa-house"></i> Return to Site</a>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. FULL ADMIN CONTENT DASHBOARD (Hidden until validated) -->
+  <div class="admin-dashboard-wrapper hidden" id="admin-dashboard-wrapper">
+    
+    <!-- Admin Navigation Header -->
+    <header class="main-header glassmorphism">
+      <div class="header-container">
+        <div class="logo-area" onclick="window.location.href='/'">
+          <img src="assets/logo.png" alt="Urban Builds Logo" class="brand-logo">
+        </div>
+
+        <div class="header-actions">
+          <button class="theme-toggle-btn" onclick="admin.toggleTheme()" aria-label="Toggle theme">
+            <i class="fa-solid fa-moon moon-icon"></i>
+            <i class="fa-solid fa-sun sun-icon"></i>
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="window.location.href='/'"><i class="fa-solid fa-house"></i> View Site</button>
+          <button class="btn btn-primary btn-sm logout-btn" onclick="admin.handleLogout()"><i class="fa-solid fa-power-off"></i> Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-main-container">
+      <div class="section-container">
+        
+        <!-- Admin Dashboard Back Header -->
+        <div class="admin-header-row">
+          <div class="admin-header-title">
+            <h2>Administrative Content Dashboard</h2>
+            <p style="color:var(--text-muted); font-size:14px;">Review analytics, change landing page backgrounds, or add and delete design guides.</p>
+          </div>
+          <div class="admin-header-actions">
+            <button class="btn btn-primary" onclick="admin.openNewProjectForm()">
+              <i class="fa-solid fa-plus"></i> Add New Design Tour
+            </button>
+          </div>
+        </div>
+
+        <div class="admin-layout-grid">
+          
+          <!-- LEFT: Landing Page Settings -->
+          <div class="admin-sidebar glassmorphism" style="display: flex; flex-direction: column; gap: 30px;">
+            <div class="admin-sidebar-section">
+              <h3><i class="fa-solid fa-photo-film"></i> Customize Landing Hero</h3>
+              <form id="hero-customizer-form" onsubmit="admin.saveHeroCustomizer(event)">
+                <div class="form-group">
+                  <label for="hero-title-input">Hero Main Title</label>
+                  <input type="text" id="hero-title-input" required placeholder="e.g. The Courtyard House">
+                </div>
+                <div class="form-group">
+                  <label for="hero-subtitle-input">Hero Sub-description</label>
+                  <textarea id="hero-subtitle-input" required rows="3" placeholder="Explain the key details of the highlight project..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="hero-bg-type">Background Media Type</label>
+                  <select id="hero-bg-type" onchange="admin.handleHeroBgTypeChange()">
+                    <option value="video">Direct mp4 Video Link</option>
+                    <option value="image">High-res Image Link</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="hero-bg-source">Media URL Source</label>
+                  <input type="text" id="hero-bg-source" required placeholder="Paste absolute video or image URL">
+                  <span class="help-text">Direct high-quality URL, e.g. direct mp4 or Unsplash image link.</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-cloud-arrow-up"></i> Apply Landing Updates</button>
+              </form>
+            </div>
+            
+            <div class="admin-sidebar-section" style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 25px;">
+              <h3><i class="fa-solid fa-address-book"></i> Edit Contact Info</h3>
+              <form id="contact-info-form" onsubmit="admin.saveContactInfo(event)">
+                <div class="form-group">
+                  <label for="contact-email-input">Contact Email</label>
+                  <input type="email" id="contact-email-input" required placeholder="e.g. contact@urbanbuilds.com">
+                </div>
+                <div class="form-group">
+                  <label for="contact-address-input">Studio Address</label>
+                  <input type="text" id="contact-address-input" required placeholder="e.g. Indiranagar, Bangalore, India">
+                </div>
+                <div class="form-group">
+                  <label for="contact-about-input">About Studio Description</label>
+                  <textarea id="contact-about-input" required rows="4" placeholder="Brief description of the design studio for footer..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Contact Info</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- RIGHT: Project Inventory Table (Add/Remove lists) -->
+          <div class="admin-main-panel glassmorphism">
+            <h3><i class="fa-solid fa-list-check"></i> Active Project Inventory</h3>
+            <div class="table-responsive">
+              <table class="admin-projects-table">
+                <thead>
+                  <tr>
+                    <th>Thumbnail</th>
+                    <th>Project Details</th>
+                    <th>Style & Area</th>
+                    <th>Budget</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-projects-list">
+                  <!-- Dynamic project listings injected here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ADMIN: CREATE/EDIT PROJECT FORM MODAL -->
+  <div class="modal-backdrop" id="project-form-modal">
+    <div class="modal-card form-modal-card glassmorphism">
+      <button class="modal-close-btn" onclick="admin.closeProjectForm()"><i class="fa-solid fa-xmark"></i></button>
+      
+      <h2 id="form-modal-title">Add New Interior Design Project</h2>
+      <p class="form-subtitle">Add specifications, floor plans, and technical details to syncreously save to the server database.</p>
+      
+      <form id="project-entry-form" onsubmit="admin.submitProjectForm(event)">
+        <input type="hidden" id="form-project-id">
+        
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-title">Project Title*</label>
+            <input type="text" id="form-title" required placeholder="e.g. The Courtyard House">
+          </div>
+          <div class="form-group">
+            <label for="form-architect">Architect Firm / Studio*</label>
+            <input type="text" id="form-architect" required placeholder="e.g. Studio Space & Form">
+          </div>
+        </div>
+
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-location">Location (City, State)*</label>
+            <input type="text" id="form-location" required placeholder="e.g. Bangalore, Karnataka">
+          </div>
+          <div class="form-group">
+            <label for="form-category">Project Category*</label>
+            <select id="form-category" required>
+              <option value="Design Tours">Design Tours</option>
+              <option value="Material Boards">Material Boards</option>
+              <option value="Floor Plans">Floor Plans</option>
+              <option value="Design Style">Design Style</option>
+              <option value="Automation">Automation</option>
+              <option value="UB Magazines">UB Magazines</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-style">Design Architectural Style*</label>
+            <select id="form-style" required>
+              <option value="Modern Minimalist">Modern Minimalist</option>
+              <option value="Contemporary Luxury">Contemporary Luxury</option>
+              <option value="Traditional Vernacular">Traditional Vernacular</option>
+              <option value="Industrial Loft">Industrial Loft</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="form-bhk">Layout configuration (BHK)*</label>
+            <input type="text" id="form-bhk" required placeholder="e.g. 4 BHK">
+          </div>
+        </div>
+
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-budget">Total Project Budget (Text Display)*</label>
+            <input type="text" id="form-budget" required placeholder="e.g. ₹1.8 Crores">
+          </div>
+          <div class="form-group">
+            <label for="form-budget-range">Filter Budget Category*</label>
+            <select id="form-budget-range" required>
+              <option value="under-1cr">Under ₹1 Crore</option>
+              <option value="1cr-2cr">₹1 Crore - ₹2 Crore</option>
+              <option value="2cr+">Above ₹2 Crore</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-area">Built-Up Area (Text Display)*</label>
+            <input type="text" id="form-area" required placeholder="e.g. 3,800 sq ft">
+          </div>
+          <div class="form-group">
+            <label for="form-area-range">Filter Area Category*</label>
+            <select id="form-area-range" required>
+              <option value="under-1500">Under 1,500 sq ft</option>
+              <option value="1500-3000">1,500 - 3,000 sq ft</option>
+              <option value="3000-5000">3,000 - 5,000 sq ft</option>
+              <option value="5000+">Above 5,000 sq ft</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-orientation">Plot Orientation / Facing</label>
+            <input type="text" id="form-orientation" placeholder="e.g. East Facing">
+          </div>
+          <div class="form-group">
+            <label for="form-year">Completion Year</label>
+            <input type="text" id="form-year" placeholder="e.g. 2024">
+          </div>
+        </div>
+
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-cost-breakdown">Estimated Cost Breakdown</label>
+            <input type="text" id="form-cost-breakdown" placeholder="e.g. ₹1.4 Cr Structure + ₹40 L Interiors">
+          </div>
+          <div class="form-group">
+            <!-- empty for visual balance -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="form-desc">Project Description Narrative*</label>
+          <textarea id="form-desc" required rows="3" placeholder="Describe the design concept, spatial structure, and architect's vision..."></textarea>
+        </div>
+
+        <div class="form-split-row">
+          <div class="form-group">
+            <label for="form-hero-image">Hero Cover Photo URL*</label>
+            <input type="text" id="form-hero-image" required placeholder="Paste elegant high-resolution photo URL">
+          </div>
+          <div class="form-group">
+            <label for="form-video-url">Video Walk-through MP4 URL (Mock Video)*</label>
+            <input type="text" id="form-video-url" required placeholder="Paste absolute video mp4 file URL">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Gallery Interior Photo URLs (Provide up to 4, one per line)*</label>
+          <textarea id="form-gallery" required rows="4" placeholder="Paste Unsplash image URL line 1&#10;Paste Unsplash image URL line 2&#10;Paste Unsplash image URL line 3&#10;Paste Unsplash image URL line 4"></textarea>
+        </div>
+
+        <!-- Dynamic Materials Specifications Builder -->
+        <div class="form-materials-builder">
+          <div class="builder-header-row">
+            <h4><i class="fa-solid fa-cubes"></i> Materials & Specification Board</h4>
+            <button type="button" class="btn btn-outline btn-sm" onclick="admin.addMaterialRowToForm()"><i class="fa-solid fa-plus"></i> Add Row</button>
+          </div>
+          <div class="table-responsive">
+            <table class="form-materials-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Brand</th>
+                  <th>Material / Model Description</th>
+                  <th>Remove</th>
+                </tr>
+              </thead>
+              <tbody id="form-materials-tbody">
+                <!-- Dynamically added rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="form-group margin-top-lg">
+          <label for="form-floor-plan">Custom SVG Floor Plan Structure (Optional)</label>
+          <textarea id="form-floor-plan" rows="4" placeholder="Paste direct <svg> tags or leave empty for a sleek auto-generated SVG plan layout"></textarea>
+          <span class="help-text">You can paste custom vector plans or let the platform build a blueprint layout.</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" onclick="admin.closeProjectForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/admin.js"></script>
+</body>
+</html>

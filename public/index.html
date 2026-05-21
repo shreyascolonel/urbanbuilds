@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Builds | Premium Architectural & Interior Design Showcase</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Premium Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="has-nav">
+
+  <!-- Navigation Header -->
+  <header class="main-header glassmorphism has-nav">
+    <div class="header-container">
+      <div class="logo-area" onclick="app.navigateToHome()">
+        <img src="assets/logo.png" alt="Urban Builds Logo" class="brand-logo">
+      </div>
+
+      <nav class="nav-links" id="category-navigation">
+        <a href="#projects-grid-section" class="nav-link active" onclick="app.filterByCategory('Design Tours', this)">Design Tours</a>
+        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Material Boards', this)">Material Boards</a>
+        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Floor Plans', this)">Floor Plans</a>
+        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Design Style', this)">Design Style</a>
+        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Automation', this)">Automation</a>
+        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('UB Magazines', this)">UB Magazines</a>
+      </nav>
+
+      <div class="header-actions">
+        <div class="theme-switch-wrapper">
+          <button class="theme-toggle-btn" id="theme-toggle" onclick="app.toggleTheme()" aria-label="Toggle light and dark theme">
+            <i class="fa-solid fa-moon moon-icon"></i>
+            <i class="fa-solid fa-sun sun-icon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Toast -->
+  <div id="toast-notification" class="toast-notification"></div>
+
+  <!-- Primary Page Views -->
+  <main id="app-view-container">
+
+    <!-- HOME VIEW -->
+    <section id="view-home" class="page-view active">
+      
+      <!-- HERO CINEMATIC BANNER -->
+      <section class="hero-banner" id="hero-section">
+        <div class="hero-video-container" id="hero-background-media">
+          <video autoplay muted loop playsinline class="hero-video" id="hero-video-element">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4" type="video/mp4">
+          </video>
+          <div class="hero-overlay"></div>
+        </div>
+        
+        <div class="hero-content-wrapper">
+          <div class="hero-glass-card glassmorphism">
+            <span class="hero-badge"><i class="fa-solid fa-star-sharp-half-stroke pulsing-icon"></i> Highlighted Showcase</span>
+            <h1 class="hero-title" id="hero-main-title">The Courtyard House</h1>
+            <p class="hero-description" id="hero-sub-title">A stunning 4 BHK sanctuary centered around an open-to-sky courtyard. Experience seamless indoor-outdoor architectural living.</p>
+            <div class="hero-btn-group">
+              <button class="btn btn-primary btn-lg" id="hero-cta-btn"><i class="fa-solid fa-circle-play"></i> Watch Walkthrough</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROJECT CARDS GRID -->
+      <section class="projects-grid-container-section" id="projects-grid-section">
+        <div class="section-container">
+          <div class="grid-header">
+            <h2 class="grid-title">Premium Home Tours & Design Walkthroughs</h2>
+            <p class="grid-subtitle" id="project-results-count">Loading architectural projects...</p>
+          </div>
+
+          <div class="project-cards-grid" id="project-cards-grid">
+            <!-- Dynamic project cards injected here -->
+          </div>
+        </div>
+      </section>
+
+    </section>
+
+  </main>
+
+  <!-- EXPANDABLE PROJECT DETAILS MODAL -->
+  <div class="modal-backdrop" id="project-detail-modal">
+    <div class="modal-card project-modal-card glassmorphism">
+      <!-- Modal Close -->
+      <button class="modal-close-btn" onclick="app.closeProjectDetail()"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="project-detail-grid">
+        
+        <!-- Left Visual Frame (Video + Gallery Carousel) -->
+        <div class="modal-visual-column">
+          <!-- Video Frame or YouTube Embed -->
+          <div class="media-playback-wrapper" id="project-modal-video-container">
+            <!-- Custom video player or YouTube frame will be dynamically rendered here -->
+          </div>
+
+          <!-- Gallery Image Slider -->
+          <div class="modal-gallery-wrapper">
+            <h4 class="media-title"><i class="fa-solid fa-images"></i> Project Gallery</h4>
+            <div class="gallery-carousel-frame">
+              <button class="carousel-nav-btn prev" onclick="app.slideGallery(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+              <div class="carousel-track-container">
+                <div class="carousel-slide-active" id="active-carousel-image-container">
+                  <img src="" alt="Active Interior Shot" id="active-carousel-image">
+                </div>
+              </div>
+              <button class="carousel-nav-btn next" onclick="app.slideGallery(1)"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            
+            <!-- Thumbnail Indicators -->
+            <div class="carousel-dots-indicator" id="carousel-dots-indicator">
+              <!-- Dynamically loaded thumbnail dots -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Specifications Column -->
+        <div class="modal-specs-column">
+          <div class="project-essential-header">
+            <span class="project-detail-style-tag" id="modal-project-style">Modern Minimalist</span>
+            <h2 id="modal-project-title">The Courtyard House</h2>
+            <p class="architect-by"><i class="fa-solid fa-compass-drafting"></i> Architect: <strong id="modal-project-architect">Studio Space & Form</strong></p>
+            <p class="location-by"><i class="fa-solid fa-location-dot"></i> <span id="modal-project-location">Bangalore, Karnataka</span></p>
+          </div>
+
+          <!-- Specs Tab Navigation -->
+          <div class="modal-tabs">
+            <button class="tab-btn active" onclick="app.switchTab(event, 'tab-overview')">Overview</button>
+            <button class="tab-btn" onclick="app.switchTab(event, 'tab-floorplan')">Floor Plan</button>
+            <button class="tab-btn" onclick="app.switchTab(event, 'tab-materials')">Material Specs</button>
+          </div>
+
+          <!-- Tab Panels -->
+          <div class="tab-content-container">
+            
+            <!-- 1. Overview Tab -->
+            <div class="tab-panel active" id="tab-overview">
+              <p class="project-long-desc" id="modal-project-desc">A deep architectural walk-through explaining details...</p>
+              
+              <div class="overview-stats-grid">
+                <div class="stat-card">
+                  <span class="stat-lbl"><i class="fa-solid fa-house-chimney"></i> Layout</span>
+                  <span class="stat-val" id="modal-stat-bhk">4 BHK</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-lbl"><i class="fa-solid fa-compass"></i> Facing</span>
+                  <span class="stat-val" id="modal-stat-orientation">East Facing</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-lbl"><i class="fa-solid fa-square-poll-vertical"></i> Total Area</span>
+                  <span class="stat-val" id="modal-stat-area">3,800 sq ft</span>
+                </div>
+                <div class="stat-card">
+                  <span class="stat-lbl"><i class="fa-solid fa-calendar-days"></i> Finished In</span>
+                  <span class="stat-val" id="modal-stat-year">2024</span>
+                </div>
+              </div>
+
+              <div class="cost-summary-box">
+                <h4><i class="fa-solid fa-wallet"></i> Estimated Budget Breakdown</h4>
+                <p id="modal-project-cost" class="cost-value">₹1.8 Crores</p>
+                <small id="modal-project-cost-breakdown">₹1.4 Cr Structure + ₹40 Lakhs Interiors</small>
+              </div>
+            </div>
+
+            <!-- 2. Floor Plan Tab -->
+            <div class="tab-panel" id="tab-floorplan">
+              <div class="floor-plan-viewer">
+                <div class="floor-plan-canvas" id="modal-floorplan-canvas">
+                  <!-- Dynamic SVG Floor Plan injected here -->
+                </div>
+                <div class="viewer-controls-legend">
+                  <span><i class="fa-solid fa-info-circle"></i> High-resolution architectural layout vector blueprint</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Material Specification Tab -->
+            <div class="tab-panel" id="tab-materials">
+              <div class="material-board-wrapper">
+                <p class="material-intro">Detailed list of brands and materials curated by the architect for this project:</p>
+                <div class="material-table-container">
+                  <table class="material-specs-table">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th>Preferred Brand</th>
+                        <th>Selected Material / Model</th>
+                      </tr>
+                    </thead>
+                    <tbody id="modal-materials-table-body">
+                      <!-- Dynamic material specs rows -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Mobile Bottom Navbar (Simple branding home link) -->
+  <div class="mobile-bottom-nav glassmorphism">
+    <button class="mobile-nav-item active" onclick="app.navigateToHome()">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <div class="footer-brand-column" style="flex: 2; min-width: 280px;">
+        <div class="logo-area">
+          <img src="assets/logo.png" alt="Urban Builds Logo" class="brand-logo">
+          <span class="brand-name">Urban Builds</span>
+        </div>
+        <p class="footer-about" id="footer-about-text">A premium architectural & interior design platform documenting state-of-the-art residential tours, floor plans, and material specifications. Handcrafted for modern home builders.</p>
+        <div class="social-icons">
+          <a href="#" aria-label="YouTube channel"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" aria-label="Instagram profile"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="Pinterest board"><i class="fa-brands fa-pinterest"></i></a>
+        </div>
+      </div>
+      <div class="footer-contact-column" style="flex: 1; min-width: 240px;">
+        <h4>Contact Studio</h4>
+        <p><i class="fa-solid fa-envelope"></i> <a href="mailto:contact@urbanbuilds.com" id="footer-email-link" style="color: inherit; text-decoration: none;">contact@urbanbuilds.com</a></p>
+        <p><i class="fa-solid fa-location-dot"></i> <span id="footer-address-text">Indiranagar, Bangalore, India</span></p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Urban Builds Studio. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
