@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8081" # Maps port 8080 on host/NAS to port 8080 inside container
+      - "8091:8091" # Maps port 8080 on host/NAS to port 8080 inside container
     volumes:
       # Persistent JSON file volume bindings to preserve project listings and hero data
       - ./projects.json:/usr/src/app/projects.json
