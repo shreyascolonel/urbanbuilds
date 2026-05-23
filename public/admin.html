@@ -111,9 +111,16 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label for="hero-bg-source">Media URL Source</label>
-                  <input type="text" id="hero-bg-source" required placeholder="Paste absolute video or image URL">
-                  <span class="help-text">Direct high-quality URL, e.g. direct mp4 or Unsplash image link.</span>
+                  <label for="hero-bg-source">Media URL Source / Upload</label>
+                  <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                    <input type="text" id="hero-bg-source" required placeholder="Paste absolute video or image URL">
+                    <label for="hero-bg-file" class="btn btn-outline btn-sm" style="margin: 0; cursor: pointer; height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;">
+                      <i class="fa-solid fa-cloud-arrow-up"></i> Upload
+                    </label>
+                    <input type="file" id="hero-bg-file" accept="image/*,video/mp4" style="display: none;" onchange="admin.handleHeroBgSourceUpload(this)">
+                  </div>
+                  <span id="upload-hero-bg-status" style="font-size: 11px; color: var(--text-muted);">No file uploaded</span>
+                  <span class="help-text">Direct high-quality URL, or upload photo/video locally.</span>
                 </div>
                 <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-cloud-arrow-up"></i> Apply Landing Updates</button>
               </form>
@@ -134,7 +141,23 @@
                   <label for="contact-about-input">About Studio Description</label>
                   <textarea id="contact-about-input" required rows="4" placeholder="Brief description of the design studio for footer..."></textarea>
                 </div>
+                <div class="form-group">
+                  <label for="contact-whatsapp-input">WhatsApp Number</label>
+                  <input type="text" id="contact-whatsapp-input" required placeholder="e.g. +919876543210">
+                </div>
                 <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-floppy-disk"></i> Save Contact Info</button>
+              </form>
+            </div>
+            
+            <div class="admin-sidebar-section" style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 25px;">
+              <h3><i class="fa-solid fa-list"></i> Navbar Categories</h3>
+              <form id="categories-editor-form" onsubmit="admin.saveCategories(event)">
+                <div class="form-group">
+                  <label for="categories-editor-textarea">Navigation Category Order (Comma-separated)</label>
+                  <textarea id="categories-editor-textarea" required rows="3" placeholder="Design Tour, Design Style, Material Boards..."></textarea>
+                  <span class="help-text">Separate categories with commas. Changing order here updates both website and forms.</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-save"></i> Save Category Order</button>
               </form>
             </div>
           </div>
@@ -182,54 +205,44 @@
             <label for="form-title">Project Title*</label>
             <input type="text" id="form-title" required placeholder="e.g. The Courtyard House">
           </div>
-          <div class="form-group">
-            <label for="form-architect">Architect Firm / Studio*</label>
-            <input type="text" id="form-architect" required placeholder="e.g. Studio Space & Form">
+          <div class="form-group standard-only-field architect-field-wrapper">
+            <label for="form-architect">Architect Firm / Studio</label>
+            <input type="text" id="form-architect" placeholder="e.g. Studio Space & Form">
           </div>
         </div>
 
         <div class="form-split-row">
-          <div class="form-group">
-            <label for="form-location">Location (City, State)*</label>
-            <input type="text" id="form-location" required placeholder="e.g. Bangalore, Karnataka">
+          <div class="form-group standard-only-field">
+            <label for="form-location">Location (City, State)</label>
+            <input type="text" id="form-location" placeholder="e.g. Bangalore, Karnataka">
           </div>
           <div class="form-group">
             <label for="form-category">Project Category*</label>
-            <select id="form-category" required>
-              <option value="Design Tours">Design Tours</option>
-              <option value="Material Boards">Material Boards</option>
-              <option value="Floor Plans">Floor Plans</option>
-              <option value="Design Style">Design Style</option>
-              <option value="Automation">Automation</option>
-              <option value="UB Magazines">UB Magazines</option>
+            <select id="form-category" required onchange="admin.handleCategoryChange()">
+              <!-- Populated dynamically -->
             </select>
           </div>
         </div>
 
-        <div class="form-split-row">
+        <div class="form-split-row standard-only-field">
           <div class="form-group">
-            <label for="form-style">Design Architectural Style*</label>
-            <select id="form-style" required>
-              <option value="Modern Minimalist">Modern Minimalist</option>
-              <option value="Contemporary Luxury">Contemporary Luxury</option>
-              <option value="Traditional Vernacular">Traditional Vernacular</option>
-              <option value="Industrial Loft">Industrial Loft</option>
-            </select>
+            <label for="form-style">Design Architectural Style</label>
+            <input type="text" id="form-style" placeholder="e.g. Modern Minimalist">
           </div>
           <div class="form-group">
-            <label for="form-bhk">Layout configuration (BHK)*</label>
-            <input type="text" id="form-bhk" required placeholder="e.g. 4 BHK">
+            <label for="form-bhk">Layout configuration (BHK)</label>
+            <input type="text" id="form-bhk" placeholder="e.g. 4 BHK">
           </div>
         </div>
 
-        <div class="form-split-row">
+        <div class="form-split-row standard-only-field budget-fields-wrapper">
           <div class="form-group">
-            <label for="form-budget">Total Project Budget (Text Display)*</label>
-            <input type="text" id="form-budget" required placeholder="e.g. ₹1.8 Crores">
+            <label for="form-budget">Total Project Budget (Text Display)</label>
+            <input type="text" id="form-budget" placeholder="e.g. ₹1.8 Crores">
           </div>
           <div class="form-group">
-            <label for="form-budget-range">Filter Budget Category*</label>
-            <select id="form-budget-range" required>
+            <label for="form-budget-range">Filter Budget Category</label>
+            <select id="form-budget-range">
               <option value="under-1cr">Under ₹1 Crore</option>
               <option value="1cr-2cr">₹1 Crore - ₹2 Crore</option>
               <option value="2cr+">Above ₹2 Crore</option>
@@ -237,14 +250,14 @@
           </div>
         </div>
 
-        <div class="form-split-row">
+        <div class="form-split-row standard-only-field">
           <div class="form-group">
-            <label for="form-area">Built-Up Area (Text Display)*</label>
-            <input type="text" id="form-area" required placeholder="e.g. 3,800 sq ft">
+            <label for="form-area">Built-Up Area (Text Display)</label>
+            <input type="text" id="form-area" placeholder="e.g. 3,800 sq ft">
           </div>
           <div class="form-group">
-            <label for="form-area-range">Filter Area Category*</label>
-            <select id="form-area-range" required>
+            <label for="form-area-range">Filter Area Category</label>
+            <select id="form-area-range">
               <option value="under-1500">Under 1,500 sq ft</option>
               <option value="1500-3000">1,500 - 3,000 sq ft</option>
               <option value="3000-5000">3,000 - 5,000 sq ft</option>
@@ -253,7 +266,7 @@
           </div>
         </div>
 
-        <div class="form-split-row">
+        <div class="form-split-row standard-only-field">
           <div class="form-group">
             <label for="form-orientation">Plot Orientation / Facing</label>
             <input type="text" id="form-orientation" placeholder="e.g. East Facing">
@@ -264,7 +277,7 @@
           </div>
         </div>
 
-        <div class="form-split-row">
+        <div class="form-split-row standard-only-field">
           <div class="form-group">
             <label for="form-cost-breakdown">Estimated Cost Breakdown</label>
             <input type="text" id="form-cost-breakdown" placeholder="e.g. ₹1.4 Cr Structure + ₹40 L Interiors">
@@ -274,29 +287,66 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="form-desc">Project Description Narrative*</label>
-          <textarea id="form-desc" required rows="3" placeholder="Describe the design concept, spatial structure, and architect's vision..."></textarea>
+        <div class="form-group standard-only-field">
+          <label for="form-desc">Project Description Narrative</label>
+          <textarea id="form-desc" rows="3" placeholder="Describe the design concept, spatial structure, and architect's vision..."></textarea>
         </div>
 
         <div class="form-split-row">
           <div class="form-group">
-            <label for="form-hero-image">Hero Cover Photo URL*</label>
-            <input type="text" id="form-hero-image" required placeholder="Paste elegant high-resolution photo URL">
+            <label for="form-hero-image">Hero Cover Photo</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="text" id="form-hero-image" placeholder="Cover Photo URL (populated on upload)">
+              <label for="form-hero-file" class="btn btn-outline btn-sm" style="margin: 0; cursor: pointer; height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap;">
+                <i class="fa-solid fa-image"></i> Upload Cover
+              </label>
+              <input type="file" id="form-hero-file" accept="image/*" style="display: none;" onchange="admin.handleHeroUpload(this)">
+            </div>
+            <span id="upload-hero-status" style="font-size: 12px; color: var(--text-muted);">No file selected</span>
           </div>
-          <div class="form-group">
-            <label for="form-video-url">Video Walk-through MP4 URL (Mock Video)*</label>
-            <input type="text" id="form-video-url" required placeholder="Paste absolute video mp4 file URL">
+          <div class="form-group video-field-wrapper">
+            <label for="form-video-url">Video Walk-through MP4 URL (Optional)</label>
+            <input type="text" id="form-video-url" placeholder="Paste video URL, or choose file below">
+            <div class="video-upload-wrapper" style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
+              <label for="form-video-file" class="btn btn-outline btn-sm" style="margin: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-file-video"></i> Upload MP4
+              </label>
+              <input type="file" id="form-video-file" accept="video/mp4" style="display: none;" onchange="admin.handleVideoUpload(this)">
+              <span id="upload-video-status" style="font-size: 12px; color: var(--text-muted);">No file selected</span>
+            </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Gallery Interior Photo URLs (Provide up to 4, one per line)*</label>
-          <textarea id="form-gallery" required rows="4" placeholder="Paste Unsplash image URL line 1&#10;Paste Unsplash image URL line 2&#10;Paste Unsplash image URL line 3&#10;Paste Unsplash image URL line 4"></textarea>
+        <!-- PDF Upload (Material Boards & UB Magazine only) -->
+        <div class="form-group" id="admin-form-group-pdf" style="display: none;">
+          <label for="form-pdf-url">PDF Document URL / Upload*</label>
+          <input type="text" id="form-pdf-url" placeholder="Paste PDF document URL, or upload file below">
+          <div class="pdf-upload-wrapper" style="margin-top: 8px; display: flex; align-items: center; gap: 10px;">
+            <label for="form-pdf-file" class="btn btn-outline btn-sm" style="margin: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-file-pdf"></i> Upload PDF
+            </label>
+            <input type="file" id="form-pdf-file" accept="application/pdf" style="display: none;" onchange="admin.handlePdfUpload(this)">
+            <span id="upload-pdf-status" style="font-size: 12px; color: var(--text-muted);">No file selected</span>
+          </div>
+        </div>
+
+        <div class="form-group standard-only-field">
+          <label>Gallery Interior Photos</label>
+          <div class="gallery-upload-container" style="border: 1px dashed rgba(255,255,255,0.15); padding: 15px; border-radius: 8px; text-align: center; background: rgba(255,255,255,0.02);">
+            <label for="form-gallery-files" class="btn btn-outline btn-sm" style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Select Gallery Images
+            </label>
+            <input type="file" id="form-gallery-files" accept="image/*" multiple style="display: none;" onchange="admin.handleGalleryUpload(this)">
+            <p style="font-size: 11px; color: var(--text-muted); margin: 0;">Upload any number of luxury interior photos.</p>
+            <span id="upload-gallery-status" style="font-size: 12px; color: var(--text-muted); display: block; margin-top: 5px;">No files selected</span>
+            
+            <div id="gallery-preview-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 12px;"></div>
+          </div>
+          <textarea id="form-gallery" style="display: none;"></textarea>
         </div>
 
         <!-- Dynamic Materials Specifications Builder -->
-        <div class="form-materials-builder">
+        <div class="form-materials-builder standard-only-field">
           <div class="builder-header-row">
             <h4><i class="fa-solid fa-cubes"></i> Materials & Specification Board</h4>
             <button type="button" class="btn btn-outline btn-sm" onclick="admin.addMaterialRowToForm()"><i class="fa-solid fa-plus"></i> Add Row</button>
@@ -318,7 +368,7 @@
           </div>
         </div>
 
-        <div class="form-group margin-top-lg">
+        <div class="form-group standard-only-field margin-top-lg">
           <label for="form-floor-plan">Custom SVG Floor Plan Structure (Optional)</label>
           <textarea id="form-floor-plan" rows="4" placeholder="Paste direct <svg> tags or leave empty for a sleek auto-generated SVG plan layout"></textarea>
           <span class="help-text">You can paste custom vector plans or let the platform build a blueprint layout.</span>
@@ -329,6 +379,45 @@
           <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Project</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- GLOBAL UPLOAD PROGRESS HUD OVERLAY -->
+  <div id="upload-progress-hud" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 12, 0.85); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: opacity 0.3s ease; opacity: 0;">
+    <style>
+      @keyframes scaleUp {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+      .hud-card {
+        background: rgba(20, 20, 25, 0.95);
+        border: 1px solid rgba(255, 149, 0, 0.25);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        width: 90%;
+        max-width: 400px;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        font-family: 'Outfit', sans-serif;
+        animation: scaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+    </style>
+    <div class="hud-card">
+      <div id="hud-icon-container" style="margin-bottom: 20px; font-size: 45px; color: var(--color-primary, #ff9500);">
+        <i class="fa-solid fa-cloud-arrow-up fa-bounce"></i>
+      </div>
+      <h4 id="hud-title" style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: white;">Uploading Content...</h4>
+      <p id="hud-filename" style="margin: 0 0 20px 0; font-size: 13px; color: #a1a1aa; word-break: break-all; padding: 0 10px;">filename.jpg</p>
+      
+      <!-- Progress Bar Container -->
+      <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 4px; overflow: hidden; width: 100%; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.04);">
+        <div id="hud-progress-bar" style="background: linear-gradient(90deg, #ff9500, #ff5e00); width: 0%; height: 100%; border-radius: 4px; transition: width 0.1s ease;"></div>
+      </div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500;">
+        <span id="hud-percentage" style="color: #ff9500;">0%</span>
+        <span id="hud-status-text" style="color: #71717a;">Syncing...</span>
+      </div>
     </div>
   </div>
 

@@ -113,7 +113,7 @@ button, input, select, textarea {
   top: 0;
   left: 0;
   right: 0;
-  height: 100px;
+  height: 80px;
   z-index: 1000;
   transition: all var(--transition-speed) ease;
   border-bottom: 1px solid var(--border-color);
@@ -135,15 +135,33 @@ button, input, select, textarea {
   align-items: center;
   gap: 12px;
   cursor: pointer;
+  position: relative;
+  width: 90px;
+  height: 80px;
 }
 
-.brand-logo {
-  height: 75px;
+.main-header .brand-logo {
+  position: absolute;
+  top: -5px;
+  left: 0;
+  height: 90px;
   width: auto;
-  filter: drop-shadow(0 0 8px var(--primary-glow));
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 10px var(--primary-glow));
+  transition: transform var(--transition-speed) ease;
+  z-index: 1010;
+}
+.main-header .brand-logo:hover {
+  transform: scale(1.05);
+}
+
+.main-footer .brand-logo {
+  height: 100px;
+  width: auto;
+  position: relative;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 6px var(--primary-glow));
   transition: transform var(--transition-speed) ease;
 }
-.brand-logo:hover {
+.main-footer .brand-logo:hover {
   transform: scale(1.04);
 }
 
@@ -327,8 +345,8 @@ html[data-theme="light"] .moon-icon {
    ========================================================================== */
 
 main {
-  margin-top: 100px;
-  min-height: calc(100vh - 100px);
+  margin-top: 80px;
+  min-height: calc(100vh - 80px);
 }
 
 .page-view {
@@ -1390,6 +1408,301 @@ html[data-theme="light"] .premium-download-banner {
   font-size: 11px;
   color: var(--text-muted);
   margin-top: 6px;
+}
+
+/* ==========================================================================
+   Light Mode Custom Overrides (Nav Bar Dark & Hero Content Dark)
+   ========================================================================== */
+
+/* Lock the Navigation Bar and its elements to dark in light mode */
+html[data-theme="light"] .main-header {
+  background: rgba(11, 11, 12, 0.85) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html[data-theme="light"] .main-header .brand-name {
+  background: linear-gradient(135deg, #F4F4F5 0%, var(--primary-color) 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+html[data-theme="light"] .main-header .brand-tagline,
+html[data-theme="light"] .main-header .nav-link {
+  color: #A1A1AA !important;
+}
+
+html[data-theme="light"] .main-header .nav-link:hover,
+html[data-theme="light"] .main-header .nav-link.active {
+  color: var(--primary-color) !important;
+}
+
+html[data-theme="light"] .main-header .theme-toggle-btn {
+  background: rgba(24, 24, 27, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #F4F4F5 !important;
+}
+
+html[data-theme="light"] .main-header .theme-toggle-btn:hover {
+  background: rgba(39, 39, 42, 0.85) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--primary-color) !important;
+  box-shadow: 0 0 10px var(--primary-glow) !important;
+}
+
+html[data-theme="light"] .main-header .btn-outline {
+  color: #F4F4F5 !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+html[data-theme="light"] .main-header .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #fff !important;
+}
+
+/* Light Theme Highlights Showcase Hero Override (Title & Description to Dark) */
+html[data-theme="light"] .hero-title {
+  color: var(--text-color) !important;
+}
+
+html[data-theme="light"] .hero-description {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="light"] .hero-banner .btn-outline {
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme="light"] .hero-banner .btn-outline:hover {
+  background: var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+/* ==========================================================================
+   14. Magazine Bookshelf & Portrait PDF Reader Styles
+   ========================================================================== */
+
+/* Bookshelf Grid Layout */
+.project-cards-grid.bookshelf-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  justify-items: center;
+  row-gap: 65px;
+  column-gap: 30px;
+  background: linear-gradient(180deg, rgba(30, 20, 15, 0.4) 0%, rgba(15, 10, 8, 0.4) 100%);
+  padding: 60px 40px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Book / Magazine Card */
+.book-card {
+  width: 210px;
+  height: 297px; /* A4 Ratio */
+  position: relative;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+/* Pseudo-wooden Shelf under each book card */
+.book-card::after {
+  content: "";
+  position: absolute;
+  bottom: -18px;
+  left: -12px;
+  right: -12px;
+  height: 12px;
+  background: linear-gradient(90deg, #321c10 0%, #522f1b 50%, #321c10 100%);
+  border-radius: 3px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  transform: rotateX(20deg);
+  z-index: 1;
+}
+
+.book-cover-3d {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.5s;
+  border-radius: 4px 8px 8px 4px;
+  box-shadow: 8px 12px 20px rgba(0, 0, 0, 0.4), -2px 0 5px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* Book Spine shadow overlay */
+.book-cover-3d::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0%, rgba(255, 255, 255, 0.1) 40%, rgba(0, 0, 0, 0.1) 60%, rgba(0, 0, 0, 0.3) 100%);
+  z-index: 10;
+  border-radius: 4px 0 0 4px;
+}
+
+.book-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px 8px 8px 4px;
+}
+
+.book-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px 15px;
+  color: #fff;
+  z-index: 5;
+}
+
+.book-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  line-height: 1.35;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  color: #fff;
+}
+
+.book-badge {
+  font-size: 9px;
+  text-transform: uppercase;
+  background: var(--primary-color);
+  color: #000;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 3px;
+  width: fit-content;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  font-family: 'Inter', sans-serif;
+}
+
+.book-read-cta {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.85;
+  transition: opacity 0.3s;
+}
+
+/* Hover Spine perspective rotation */
+.book-card:hover .book-cover-3d {
+  transform: rotateY(-20deg) translateZ(15px);
+  box-shadow: 15px 22px 30px rgba(0, 0, 0, 0.6), -5px 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.book-card:hover .book-read-cta {
+  opacity: 1;
+}
+
+/* Magazine Reader Portrait Modal overrides */
+.magazine-modal-card {
+  width: 90vw;
+  height: 92vh;
+  max-width: 850px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 15, 15, 0.96) !important;
+  border: 1px solid rgba(255, 149, 0, 0.25) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 768px) {
+  .magazine-modal-card {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100% !important;
+    border-radius: 0 !important;
+    padding: 15px !important;
+    border: none !important;
+  }
+}
+
+.magazine-reader-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 15px;
+}
+
+.magazine-title-heading {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pdf-iframe-wrapper {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #141414;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Floating WhatsApp Contact Widget */
+.whatsapp-float-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: #25D366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 0px rgba(37, 211, 102, 0.5);
+  z-index: 9999;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: whatsapp-pulse 2s infinite;
+}
+.whatsapp-float-btn:hover {
+  transform: scale(1.1);
+  color: #fff;
+}
+@keyframes whatsapp-pulse {
+  0% {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 0px rgba(37, 211, 102, 0.7);
+  }
+  70% {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 15px rgba(37, 211, 102, 0);
+  }
+  100% {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 0px rgba(37, 211, 102, 0);
+  }
+}
+
+/* Ensure mobile sticky bottom navbar is hidden completely */
+.mobile-bottom-nav {
+  display: none !important;
+}
+body {
+  padding-bottom: 0px !important;
 }
 
 /* Project Inventory Table */

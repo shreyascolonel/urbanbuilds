@@ -92,8 +92,8 @@ app.post('/api/projects', requireAdminAuth, (req, res) => {
   const projectsPath = path.join(__dirname, 'projects.json');
   const projects = readJsonFile(projectsPath, []);
 
-  if (!newProject.title || !newProject.architect || !newProject.location) {
-    return res.status(400).json({ success: false, message: "Title, Architect, and Location are required." });
+  if (!newProject.title) {
+    return res.status(400).json({ success: false, message: "Title is required." });
   }
 
   const existingIndex = projects.findIndex(p => p.id === newProject.id);
@@ -166,7 +166,8 @@ app.get('/api/contact', (req, res) => {
   const defaultContact = {
     email: "contact@urbanbuilds.com",
     address: "Indiranagar, Bangalore, India",
-    about: "A premium architectural & interior design platform documenting state-of-the-art residential tours, floor plans, and material specifications. Handcrafted for modern home builders."
+    about: "A premium architectural & interior design platform documenting state-of-the-art residential tours, floor plans, and material specifications. Handcrafted for modern home builders.",
+    whatsapp: "+919876543210"
   };
   const contact = readJsonFile(contactPath, defaultContact);
   res.json(contact);
@@ -177,12 +178,143 @@ app.post('/api/contact', requireAdminAuth, (req, res) => {
   const newContact = req.body;
   const contactPath = path.join(__dirname, 'contact.json');
   
-  if (!newContact.email || !newContact.address || !newContact.about) {
-    return res.status(400).json({ success: false, message: "Email, address, and about description are required." });
+  if (!newContact.email || !newContact.address || !newContact.about || !newContact.whatsapp) {
+    return res.status(400).json({ success: false, message: "Email, address, about description, and WhatsApp contact are required." });
   }
 
   writeJsonFile(contactPath, newContact);
   res.json({ success: true, message: "Contact details updated successfully on server.", contact: newContact });
+});
+
+// 9. GET Categories list
+app.get('/api/categories', (req, res) => {
+  const categoriesPath = path.join(__dirname, 'categories.json');
+  const defaultCategories = [
+    "Design Tour",
+    "Design Style",
+    "Material Boards",
+    "Floor Plan",
+    "UB Magazine"
+  ];
+  const categories = readJsonFile(categoriesPath, defaultCategories);
+  res.json(categories);
+});
+
+// 10. POST Categories list (Requires Auth)
+app.post('/api/categories', requireAdminAuth, (req, res) => {
+  const newCategories = req.body;
+  const categoriesPath = path.join(__dirname, 'categories.json');
+  
+  if (!Array.isArray(newCategories) || newCategories.length === 0) {
+    return res.status(400).json({ success: false, message: "Categories must be a non-empty array." });
+  }
+
+  writeJsonFile(categoriesPath, newCategories);
+  res.json({ success: true, message: "Navbar categories updated successfully on server.", categories: newCategories });
+});
+
+// 11. POST Video Upload (Requires Auth)
+app.post('/api/upload-video', requireAdminAuth, (req, res) => {
+  const { filename, base64Data } = req.body;
+  
+  if (!filename || !base64Data) {
+    return res.status(400).json({ success: false, message: "Filename and base64Data are required." });
+  }
+
+  const uploadsDir = path.join(__dirname, 'public', 'uploads');
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadsDir, filename);
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filePath, buffer);
+
+    res.json({
+      success: true,
+      message: "Video file uploaded and stored successfully.",
+      url: `/uploads/${filename}`
+    });
+  } catch (e) {
+    console.error("Video upload saving error:", e);
+    res.status(500).json({ success: false, message: "Failed to store uploaded video on server." });
+  }
+});
+
+// 12. POST PDF Upload (Requires Auth)
+app.post('/api/upload-pdf', requireAdminAuth, (req, res) => {
+  const { filename, base64Data } = req.body;
+  
+  if (!filename || !base64Data) {
+    return res.status(400).json({ success: false, message: "Filename and base64Data are required." });
+  }
+
+  const uploadsDir = path.join(__dirname, 'public', 'uploads');
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadsDir, filename);
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filePath, buffer);
+
+    res.json({
+      success: true,
+      message: "PDF file uploaded and stored successfully.",
+      url: `/uploads/${filename}`
+    });
+  } catch (e) {
+    console.error("PDF upload saving error:", e);
+    res.status(500).json({ success: false, message: "Failed to store uploaded PDF on server." });
+  }
+});
+
+// 13. POST Photo Upload (Requires Auth)
+app.post('/api/upload-photo', requireAdminAuth, (req, res) => {
+  const { filename, base64Data } = req.body;
+  
+  if (!filename || !base64Data) {
+    return res.status(400).json({ success: false, message: "Filename and base64Data are required." });
+  }
+
+  const uploadsDir = path.join(__dirname, 'public', 'uploads');
+  try {
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadsDir, filename);
+    const buffer = Buffer.from(base64Data, 'base64');
+    fs.writeFileSync(filePath, buffer);
+
+    res.json({
+      success: true,
+      message: "Photo uploaded and stored successfully.",
+      url: `/uploads/${filename}`
+    });
+  } catch (e) {
+    console.error("Photo upload saving error:", e);
+    res.status(500).json({ success: false, message: "Failed to store uploaded photo on server." });
+  }
+});
+
+// API 404 Handler - fallback for unmatched API requests
+app.use('/api', (req, res, next) => {
+  res.status(404).json({
+    success: false,
+    message: `API endpoint not found: ${req.method} ${req.originalUrl}`
+  });
+});
+
+// Custom Error Handling Middleware for standard JSON errors (e.g. body-parser limit exceeded)
+app.use((err, req, res, next) => {
+  console.error("Express Server Error:", err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "An unexpected server error occurred."
+  });
 });
 
 // For any other route, redirect to main landing page

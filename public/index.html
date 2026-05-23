@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/app.css">
+  <!-- PDF.js for Native Immersive PDF Reader -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 </head>
 <body class="has-nav">
 
@@ -23,12 +25,7 @@
       </div>
 
       <nav class="nav-links" id="category-navigation">
-        <a href="#projects-grid-section" class="nav-link active" onclick="app.filterByCategory('Design Tours', this)">Design Tours</a>
-        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Material Boards', this)">Material Boards</a>
-        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Floor Plans', this)">Floor Plans</a>
-        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Design Style', this)">Design Style</a>
-        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('Automation', this)">Automation</a>
-        <a href="#projects-grid-section" class="nav-link" onclick="app.filterByCategory('UB Magazines', this)">UB Magazines</a>
+        <!-- Dynamic categories loaded from database -->
       </nav>
 
       <div class="header-actions">
@@ -130,7 +127,7 @@
           <div class="project-essential-header">
             <span class="project-detail-style-tag" id="modal-project-style">Modern Minimalist</span>
             <h2 id="modal-project-title">The Courtyard House</h2>
-            <p class="architect-by"><i class="fa-solid fa-compass-drafting"></i> Architect: <strong id="modal-project-architect">Studio Space & Form</strong></p>
+            <p class="architect-by" id="modal-architect-wrapper"><i class="fa-solid fa-compass-drafting"></i> Architect: <strong id="modal-project-architect">Studio Space & Form</strong></p>
             <p class="location-by"><i class="fa-solid fa-location-dot"></i> <span id="modal-project-location">Bangalore, Karnataka</span></p>
           </div>
 
@@ -149,25 +146,25 @@
               <p class="project-long-desc" id="modal-project-desc">A deep architectural walk-through explaining details...</p>
               
               <div class="overview-stats-grid">
-                <div class="stat-card">
+                <div class="stat-card" id="modal-stat-card-bhk">
                   <span class="stat-lbl"><i class="fa-solid fa-house-chimney"></i> Layout</span>
                   <span class="stat-val" id="modal-stat-bhk">4 BHK</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" id="modal-stat-card-orientation">
                   <span class="stat-lbl"><i class="fa-solid fa-compass"></i> Facing</span>
                   <span class="stat-val" id="modal-stat-orientation">East Facing</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" id="modal-stat-card-area">
                   <span class="stat-lbl"><i class="fa-solid fa-square-poll-vertical"></i> Total Area</span>
                   <span class="stat-val" id="modal-stat-area">3,800 sq ft</span>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card" id="modal-stat-card-year">
                   <span class="stat-lbl"><i class="fa-solid fa-calendar-days"></i> Finished In</span>
                   <span class="stat-val" id="modal-stat-year">2024</span>
                 </div>
               </div>
 
-              <div class="cost-summary-box">
+              <div class="cost-summary-box" id="modal-cost-summary-wrapper">
                 <h4><i class="fa-solid fa-wallet"></i> Estimated Budget Breakdown</h4>
                 <p id="modal-project-cost" class="cost-value">₹1.8 Crores</p>
                 <small id="modal-project-cost-breakdown">₹1.4 Cr Structure + ₹40 Lakhs Interiors</small>
@@ -214,12 +211,56 @@
     </div>
   </div>
 
-  <!-- Sticky Mobile Bottom Navbar (Simple branding home link) -->
-  <div class="mobile-bottom-nav glassmorphism">
-    <button class="mobile-nav-item active" onclick="app.navigateToHome()">
-      <i class="fa-solid fa-house"></i>
-      <span>Home</span>
-    </button>
+
+
+  <!-- MAGAZINE READER MODAL -->
+  <div class="modal-backdrop" id="magazine-reader-modal">
+    <div class="modal-card magazine-modal-card glassmorphism">
+      <!-- Modal Close -->
+      <button class="modal-close-btn" onclick="app.closeMagazineReader()"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="magazine-reader-container">
+        <h3 class="magazine-title-heading"><i class="fa-solid fa-book-open"></i> <span id="magazine-modal-title">UB Magazine</span></h3>
+        <div class="pdf-iframe-wrapper" id="pdf-viewer-wrapper" style="overflow: auto; flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;">
+          <!-- Custom PDF Viewer Canvas Container -->
+          <div id="pdf-canvas-container" style="width: 100%; overflow-y: auto; overflow-x: hidden; display: flex; justify-content: center; flex: 1;">
+            <canvas id="pdf-render-canvas" style="display: block; max-width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-radius: 4px;"></canvas>
+          </div>
+          
+          <!-- Glassmorphic Controls Bar -->
+          <div class="pdf-controls-bar glassmorphism" style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px 20px; border-radius: 30px; margin-top: 15px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.1); width: fit-content; margin-left: auto; margin-right: auto; z-index: 10; flex-wrap: wrap;">
+            <button class="btn btn-outline btn-sm" id="pdf-prev-btn" onclick="app.pdfPrevPage()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: white;">
+              <span>Page</span>
+              <input type="number" id="pdf-current-page" value="1" min="1" style="width: 50px; text-align: center; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 3px 5px; font-family: 'Outfit', sans-serif; outline: none;" onchange="app.pdfGoToPage(this.value)">
+              <span>of</span>
+              <span id="pdf-total-pages">1</span>
+            </div>
+            <button class="btn btn-outline btn-sm" id="pdf-next-btn" onclick="app.pdfNextPage()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            
+            <!-- Zoom Controls -->
+            <div style="height: 15px; width: 1px; background: rgba(255,255,255,0.2); margin: 0 5px;"></div>
+            <button class="btn btn-outline btn-sm" id="pdf-zoom-out" onclick="app.pdfZoomOut()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
+              <i class="fa-solid fa-magnifying-glass-minus"></i>
+            </button>
+            <span id="pdf-zoom-level" style="font-size: 12px; min-width: 35px; text-align: center; color: white; font-weight: 500;">100%</span>
+            <button class="btn btn-outline btn-sm" id="pdf-zoom-in" onclick="app.pdfZoomIn()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
+              <i class="fa-solid fa-magnifying-glass-plus"></i>
+            </button>
+          </div>
+          
+          <!-- Loading Overlay Inside PDF Wrapper -->
+          <div id="pdf-loading-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,15,18,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; border-radius: 8px;">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 40px; color: var(--color-primary, #ff9500); margin-bottom: 15px;"></i>
+            <span style="font-weight: 500; font-family: 'Outfit'; color: white;">Loading Immersive PDF...</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Footer -->
@@ -228,14 +269,8 @@
       <div class="footer-brand-column" style="flex: 2; min-width: 280px;">
         <div class="logo-area">
           <img src="assets/logo.png" alt="Urban Builds Logo" class="brand-logo">
-          <span class="brand-name">Urban Builds</span>
         </div>
         <p class="footer-about" id="footer-about-text">A premium architectural & interior design platform documenting state-of-the-art residential tours, floor plans, and material specifications. Handcrafted for modern home builders.</p>
-        <div class="social-icons">
-          <a href="#" aria-label="YouTube channel"><i class="fa-brands fa-youtube"></i></a>
-          <a href="#" aria-label="Instagram profile"><i class="fa-brands fa-instagram"></i></a>
-          <a href="#" aria-label="Pinterest board"><i class="fa-brands fa-pinterest"></i></a>
-        </div>
       </div>
       <div class="footer-contact-column" style="flex: 1; min-width: 240px;">
         <h4>Contact Studio</h4>
@@ -247,6 +282,11 @@
       <p>&copy; 2026 Urban Builds Studio. All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- Floating WhatsApp Contact Button -->
+  <a class="whatsapp-float-btn" id="global-whatsapp-btn" target="_blank" aria-label="Contact on WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
 
   <!-- Scripts -->
   <script src="js/app.js"></script>
