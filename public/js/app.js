@@ -161,18 +161,39 @@ class UrbanBuildsApp {
     });
   }
 
+  buildMapsUrl(contact) {
+    const mapsLocation = (contact.mapsLocation || contact.address || "").trim();
+    if (!mapsLocation) return null;
+
+    if (/^https?:\/\//i.test(mapsLocation)) {
+      return mapsLocation;
+    }
+
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsLocation)}`;
+  }
+
   applyContactSettings(contact) {
     this.contactInfo = contact;
     const aboutEl = document.getElementById("footer-about-text");
     const emailEl = document.getElementById("footer-email-link");
-    const addressEl = document.getElementById("footer-address-text");
+    const addressEl = document.getElementById("footer-address-link");
 
     if (aboutEl) aboutEl.innerText = contact.about;
     if (emailEl) {
       emailEl.innerText = contact.email;
       emailEl.href = `mailto:${contact.email}`;
     }
-    if (addressEl) addressEl.innerText = contact.address;
+    if (addressEl) {
+      addressEl.innerText = contact.address || "";
+      const mapsUrl = this.buildMapsUrl(contact);
+      if (mapsUrl) {
+        addressEl.href = mapsUrl;
+        addressEl.removeAttribute("aria-disabled");
+      } else {
+        addressEl.href = "#";
+        addressEl.setAttribute("aria-disabled", "true");
+      }
+    }
 
     // Bind floating global WhatsApp button
     const whatsappEl = document.getElementById("global-whatsapp-btn");

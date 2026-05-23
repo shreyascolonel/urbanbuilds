@@ -175,6 +175,7 @@ app.get('/api/contact', (req, res) => {
   const defaultContact = {
     email: "contact@urbanbuilds.com",
     address: "Indiranagar, Bangalore, India",
+    mapsLocation: "Indiranagar, Bangalore, India",
     about: "A premium architectural & interior design platform documenting state-of-the-art residential tours, floor plans, and material specifications. Handcrafted for modern home builders.",
     whatsapp: "+919876543210"
   };
@@ -191,8 +192,16 @@ app.post('/api/contact', requireAdminAuth, (req, res) => {
     return res.status(400).json({ success: false, message: "Email, address, about description, and WhatsApp contact are required." });
   }
 
-  writeJsonFile(contactPath, newContact);
-  res.json({ success: true, message: "Contact details updated successfully on server.", contact: newContact });
+  const contactToSave = {
+    email: newContact.email.trim(),
+    address: newContact.address.trim(),
+    mapsLocation: (newContact.mapsLocation || newContact.address || "").trim(),
+    about: newContact.about.trim(),
+    whatsapp: newContact.whatsapp.trim()
+  };
+
+  writeJsonFile(contactPath, contactToSave);
+  res.json({ success: true, message: "Contact details updated successfully on server.", contact: contactToSave });
 });
 
 // 9. GET Categories list

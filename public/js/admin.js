@@ -714,11 +714,13 @@ class UrbanBuildsAdmin {
         // Populates settings form
         const emailInput = document.getElementById("contact-email-input");
         const addressInput = document.getElementById("contact-address-input");
+        const mapsLocationInput = document.getElementById("contact-maps-location-input");
         const aboutInput = document.getElementById("contact-about-input");
         const whatsappInput = document.getElementById("contact-whatsapp-input");
 
         if (emailInput) emailInput.value = contact.email || "";
         if (addressInput) addressInput.value = contact.address || "";
+        if (mapsLocationInput) mapsLocationInput.value = contact.mapsLocation || "";
         if (aboutInput) aboutInput.value = contact.about || "";
         if (whatsappInput) whatsappInput.value = contact.whatsapp || "";
       }
@@ -732,11 +734,12 @@ class UrbanBuildsAdmin {
 
     const email = document.getElementById("contact-email-input").value.trim();
     const address = document.getElementById("contact-address-input").value.trim();
+    const mapsLocation = document.getElementById("contact-maps-location-input").value.trim();
     const about = document.getElementById("contact-about-input").value.trim();
     const whatsapp = document.getElementById("contact-whatsapp-input").value.trim();
 
     if (!email || !address || !about || !whatsapp) {
-      this.showToast("Please fill all contact parameters.", "error");
+      this.showToast("Please fill all required contact fields.", "error");
       return;
     }
 
@@ -744,7 +747,7 @@ class UrbanBuildsAdmin {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: this.getAuthHeaders(),
-        body: JSON.stringify({ email, address, about, whatsapp })
+        body: JSON.stringify({ email, address, mapsLocation, about, whatsapp })
       });
 
       const data = await response.json();
