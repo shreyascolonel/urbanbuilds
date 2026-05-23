@@ -2,7 +2,7 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Urban Builds | Premium Architectural & Interior Design Showcase</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,6 +14,10 @@
   <link rel="stylesheet" href="css/app.css">
   <!-- PDF.js for Native Immersive PDF Reader -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+  <script>
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+  </script>
 </head>
 <body class="has-nav">
 
@@ -51,7 +55,7 @@
       <!-- HERO CINEMATIC BANNER -->
       <section class="hero-banner" id="hero-section">
         <div class="hero-video-container" id="hero-background-media">
-          <video autoplay muted loop playsinline class="hero-video" id="hero-video-element">
+          <video autoplay muted loop playsinline playsInline disablePictureInPicture controlsList="nodownload" class="hero-video" id="hero-video-element">
             <source src="https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4" type="video/mp4">
           </video>
           <div class="hero-overlay"></div>
@@ -83,6 +87,46 @@
         </div>
       </section>
 
+    </section>
+
+    <!-- MAGAZINE PDF READER (full-width, 100% viewport) -->
+    <section id="view-magazine-reader" class="page-view magazine-reader-view" aria-label="Magazine PDF reader">
+      <button type="button" class="magazine-float-back glassmorphism" onclick="app.closeMagazineReader()" aria-label="Back to magazine library">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span class="magazine-float-back-label">Back</span>
+      </button>
+
+      <div class="magazine-reader-scroll" id="pdf-pages-scroll">
+        <!-- PDF pages injected by app.js -->
+      </div>
+
+      <div class="pdf-controls-bar glassmorphism" id="pdf-controls-bar">
+        <button type="button" class="pdf-nav-btn" id="pdf-prev-btn" onclick="app.pdfPrevPage()" aria-label="Previous page" disabled>
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="pdf-page-indicator">
+          <span class="pdf-page-label">Page</span>
+          <input type="number" id="pdf-current-page" value="1" min="1" aria-label="Current page" onchange="app.pdfGoToPage(this.value)">
+          <span>of</span>
+          <span id="pdf-total-pages">1</span>
+        </div>
+        <button type="button" class="pdf-nav-btn" id="pdf-next-btn" onclick="app.pdfNextPage()" aria-label="Next page">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <div class="pdf-controls-divider" aria-hidden="true"></div>
+        <button type="button" class="pdf-nav-btn pdf-zoom-btn" id="pdf-zoom-out" onclick="app.pdfZoomOut()" aria-label="Zoom out">
+          <i class="fa-solid fa-magnifying-glass-minus"></i>
+        </button>
+        <span class="pdf-zoom-level" id="pdf-zoom-level">100%</span>
+        <button type="button" class="pdf-nav-btn pdf-zoom-btn" id="pdf-zoom-in" onclick="app.pdfZoomIn()" aria-label="Zoom in">
+          <i class="fa-solid fa-magnifying-glass-plus"></i>
+        </button>
+      </div>
+
+      <div class="pdf-loading-overlay" id="pdf-loading-overlay">
+        <i class="fa-solid fa-circle-notch fa-spin"></i>
+        <span>Loading magazine…</span>
+      </div>
     </section>
 
   </main>
@@ -206,58 +250,6 @@
 
           </div>
 
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-  <!-- MAGAZINE READER MODAL -->
-  <div class="modal-backdrop" id="magazine-reader-modal">
-    <div class="modal-card magazine-modal-card glassmorphism">
-      <!-- Modal Close -->
-      <button class="modal-close-btn" onclick="app.closeMagazineReader()"><i class="fa-solid fa-xmark"></i></button>
-      
-      <div class="magazine-reader-container">
-        <h3 class="magazine-title-heading"><i class="fa-solid fa-book-open"></i> <span id="magazine-modal-title">UB Magazine</span></h3>
-        <div class="pdf-iframe-wrapper" id="pdf-viewer-wrapper" style="overflow: auto; flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;">
-          <!-- Custom PDF Viewer Canvas Container -->
-          <div id="pdf-canvas-container" style="width: 100%; overflow-y: auto; overflow-x: hidden; display: flex; justify-content: center; flex: 1;">
-            <canvas id="pdf-render-canvas" style="display: block; max-width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.5); border-radius: 4px;"></canvas>
-          </div>
-          
-          <!-- Glassmorphic Controls Bar -->
-          <div class="pdf-controls-bar glassmorphism" style="display: flex; align-items: center; justify-content: center; gap: 15px; padding: 10px 20px; border-radius: 30px; margin-top: 15px; background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.1); width: fit-content; margin-left: auto; margin-right: auto; z-index: 10; flex-wrap: wrap;">
-            <button class="btn btn-outline btn-sm" id="pdf-prev-btn" onclick="app.pdfPrevPage()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
-              <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: white;">
-              <span>Page</span>
-              <input type="number" id="pdf-current-page" value="1" min="1" style="width: 50px; text-align: center; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 4px; padding: 3px 5px; font-family: 'Outfit', sans-serif; outline: none;" onchange="app.pdfGoToPage(this.value)">
-              <span>of</span>
-              <span id="pdf-total-pages">1</span>
-            </div>
-            <button class="btn btn-outline btn-sm" id="pdf-next-btn" onclick="app.pdfNextPage()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
-              <i class="fa-solid fa-chevron-right"></i>
-            </button>
-            
-            <!-- Zoom Controls -->
-            <div style="height: 15px; width: 1px; background: rgba(255,255,255,0.2); margin: 0 5px;"></div>
-            <button class="btn btn-outline btn-sm" id="pdf-zoom-out" onclick="app.pdfZoomOut()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
-              <i class="fa-solid fa-magnifying-glass-minus"></i>
-            </button>
-            <span id="pdf-zoom-level" style="font-size: 12px; min-width: 35px; text-align: center; color: white; font-weight: 500;">100%</span>
-            <button class="btn btn-outline btn-sm" id="pdf-zoom-in" onclick="app.pdfZoomIn()" style="border-radius: 50%; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; min-width: auto; cursor: pointer;">
-              <i class="fa-solid fa-magnifying-glass-plus"></i>
-            </button>
-          </div>
-          
-          <!-- Loading Overlay Inside PDF Wrapper -->
-          <div id="pdf-loading-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15,15,18,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; border-radius: 8px;">
-            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 40px; color: var(--color-primary, #ff9500); margin-bottom: 15px;"></i>
-            <span style="font-weight: 500; font-family: 'Outfit'; color: white;">Loading Immersive PDF...</span>
-          </div>
         </div>
       </div>
     </div>

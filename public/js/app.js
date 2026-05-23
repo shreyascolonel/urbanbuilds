@@ -20,9 +20,23 @@ class UrbanBuildsApp {
     this.pdfZoomScale = 1.0;
     this.pdfIsRendering = false;
     this.pdfPagePendingNum = null;
+    this.pdfPageObserver = null;
+    this.pdfResizeTimer = null;
+    this.activeMagazineProject = null;
+  }
+
+  resetPageScroll() {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }
 
   async init() {
+    this.resetPageScroll();
+
     // 1. Initialize Theme (persists in localStorage)
     this.initTheme();
 
@@ -31,11 +45,30 @@ class UrbanBuildsApp {
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
     }
 
-    // Handle dynamic PDF resizing to fit container width
-    window.addEventListener("resize", () => {
-      const modal = document.getElementById("magazine-reader-modal");
-      if (this.pdfDoc && modal && modal.classList.contains("active")) {
-        this.queueRenderPdfPage(this.pdfCurrentPageNum);
+    // Re-measure reader layout on resize / mobile browser chrome changes
+    const onReaderLayoutChange = () => {
+      const readerView = document.getElementById("view-magazine-reader");
+      if (!readerView || !readerView.classList.contains("active")) return;
+      clearTimeout(this.pdfResizeTimer);
+      this.pdfResizeTimer = setTimeout(() => {
+        this.updateMagazineReaderLayout();
+        if (this.pdfDoc) this.rerenderAllPdfPages();
+      }, 150);
+    };
+    window.addEventListener("resize", onReaderLayoutChange);
+    window.visualViewport?.addEventListener("resize", onReaderLayoutChange);
+    window.visualViewport?.addEventListener("scroll", onReaderLayoutChange);
+
+    // Keyboard prev/next when magazine reader is open
+    document.addEventListener("keydown", (e) => {
+      const readerView = document.getElementById("view-magazine-reader");
+      if (!readerView || !readerView.classList.contains("active") || !this.pdfDoc) return;
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        this.pdfPrevPage();
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        this.pdfNextPage();
       }
     });
 
@@ -46,6 +79,11 @@ class UrbanBuildsApp {
     this.renderProjectGrid();
 
     this.showToast("Welcome to Urban Builds Premium Tours", "info");
+
+    // Keep viewport at top after layout shifts (images, hero video, toast on mobile)
+    this.resetPageScroll();
+    requestAnimationFrame(() => this.resetPageScroll());
+    setTimeout(() => this.resetPageScroll(), 100);
   }
 
   /* ==========================================================================
@@ -80,6 +118,7 @@ class UrbanBuildsApp {
       if (heroRes.ok) {
         const heroData = await heroRes.json();
         this.applyHeroSettings(heroData);
+        this.resetPageScroll();
       }
 
       // Fetch Contact settings
@@ -111,10 +150,11 @@ class UrbanBuildsApp {
 
     categories.forEach((cat, idx) => {
       const a = document.createElement("a");
-      a.href = "#projects-grid-section";
+      a.href = "#";
       a.className = `nav-link ${cat === this.activeCategory ? "active" : ""}`;
       a.innerText = cat;
       a.onclick = (e) => {
+        e.preventDefault();
         this.filterByCategory(cat, a);
       };
       catNav.appendChild(a);
@@ -155,7 +195,7 @@ class UrbanBuildsApp {
       mediaContainer.innerHTML = ""; // Clear existing
       if (hero.bgType === "video") {
         mediaContainer.innerHTML = `
-          <video autoplay muted loop playsinline class="hero-video" id="hero-video-element">
+          <video autoplay muted loop playsinline disablePictureInPicture controlsList="nodownload" class="hero-video" id="hero-video-element">
             <source src="${hero.source}" type="video/mp4">
           </video>
           <div class="hero-overlay"></div>
@@ -192,7 +232,20 @@ class UrbanBuildsApp {
      Navigation & Routing Routing
      ========================================================================== */
 
+  navigateToHome() {
+    const readerView = document.getElementById("view-magazine-reader");
+    if (readerView && readerView.classList.contains("active")) {
+      this.closeMagazineReader();
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   filterByCategory(categoryName, element) {
+    const readerView = document.getElementById("view-magazine-reader");
+    if (readerView && readerView.classList.contains("active")) {
+      this.closeMagazineReader();
+    }
+
     this.activeCategory = categoryName;
 
     // Toggle active classes on category links
@@ -378,173 +431,304 @@ class UrbanBuildsApp {
   }
 
   /* ==========================================================================
-     Magazine PDF Document Reader Handlers
+     Magazine PDF Document Reader (full-width inline view)
      ========================================================================== */
 
   async openMagazineReader(id) {
     const project = this.projects.find(p => p.id === id);
     if (!project) return;
 
-    const modalEl = document.getElementById("magazine-reader-modal");
-    const titleEl = document.getElementById("magazine-modal-title");
+    const pdfUrl = project.pdfUrl || "";
+    if (!pdfUrl) {
+      this.showToast("No PDF document link provided.", "error");
+      return;
+    }
+
+    const homeView = document.getElementById("view-home");
+    const readerView = document.getElementById("view-magazine-reader");
     const loadingOverlay = document.getElementById("pdf-loading-overlay");
+    const scrollEl = document.getElementById("pdf-pages-scroll");
 
-    if (modalEl && titleEl) {
-      titleEl.innerText = project.title;
-      modalEl.classList.add("active");
-      document.body.style.overflow = "hidden";
+    if (!readerView || !scrollEl) return;
 
-      if (loadingOverlay) loadingOverlay.style.display = "flex";
+    this.activeMagazineProject = project;
+    const floatBack = readerView.querySelector(".magazine-float-back");
+    if (floatBack) {
+      floatBack.setAttribute("aria-label", `Back to library — ${project.title}`);
+      floatBack.title = project.title;
+    }
 
-      const pdfUrl = project.pdfUrl || "";
-      if (!pdfUrl) {
-        this.showToast("No PDF document link provided.", "error");
-        if (loadingOverlay) loadingOverlay.style.display = "none";
-        return;
-      }
+    homeView?.classList.remove("active");
+    readerView.classList.add("active");
+    document.body.classList.add("magazine-reader-active");
+    window.scrollTo({ top: 0, behavior: "auto" });
 
-      try {
-        // Load PDF using PDF.js
-        const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
-        this.pdfDoc = await loadingTask.promise;
-        this.pdfCurrentPageNum = 1;
-        this.pdfZoomScale = 1.0;
-        
-        const totalPagesEl = document.getElementById("pdf-total-pages");
-        if (totalPagesEl) totalPagesEl.innerText = this.pdfDoc.numPages;
+    if (loadingOverlay) loadingOverlay.classList.add("active");
+    scrollEl.innerHTML = "";
 
-        const currentPageEl = document.getElementById("pdf-current-page");
-        if (currentPageEl) {
-          currentPageEl.value = 1;
-          currentPageEl.max = this.pdfDoc.numPages;
-        }
+    try {
+      const loadingTask = window.pdfjsLib.getDocument(pdfUrl);
+      this.pdfDoc = await loadingTask.promise;
+      this.pdfCurrentPageNum = 1;
+      this.pdfZoomScale = 1.0;
 
-        const zoomLevelEl = document.getElementById("pdf-zoom-level");
-        if (zoomLevelEl) zoomLevelEl.innerText = "100%";
+      this.buildPdfPageStructure();
+      this.updateMagazineReaderLayout();
+      await this.rerenderAllPdfPages();
+      this.setupPdfPageObserver();
+      this.updatePdfControls();
 
-        // Render first page
-        await this.renderPdfPage(this.pdfCurrentPageNum);
-      } catch (err) {
-        console.error("Error loading PDF with PDF.js:", err);
-        this.showToast("Failed to load PDF document dynamically.", "error");
-      } finally {
-        if (loadingOverlay) loadingOverlay.style.display = "none";
-      }
+      const scrollContainer = document.querySelector(".magazine-reader-scroll");
+      if (scrollContainer) scrollContainer.scrollTop = 0;
+      requestAnimationFrame(() => this.updateMagazineReaderLayout());
+    } catch (err) {
+      console.error("Error loading PDF with PDF.js:", err);
+      this.showToast("Failed to load PDF document.", "error");
+      this.closeMagazineReader();
+    } finally {
+      if (loadingOverlay) loadingOverlay.classList.remove("active");
     }
   }
 
-  async renderPdfPage(num) {
+  buildPdfPageStructure() {
+    const scrollEl = document.getElementById("pdf-pages-scroll");
+    if (!scrollEl || !this.pdfDoc) return;
+
+    scrollEl.innerHTML = "";
+    for (let i = 1; i <= this.pdfDoc.numPages; i++) {
+      const wrap = document.createElement("div");
+      wrap.className = "pdf-page-wrap";
+      wrap.id = `pdf-page-${i}`;
+      wrap.dataset.page = String(i);
+
+      const canvas = document.createElement("canvas");
+      canvas.className = "pdf-page-canvas";
+      canvas.setAttribute("aria-label", `Page ${i}`);
+
+      wrap.appendChild(canvas);
+      scrollEl.appendChild(wrap);
+    }
+  }
+
+  updateMagazineReaderLayout() {
+    if (!document.body.classList.contains("magazine-reader-active")) return;
+
+    const readerView = document.getElementById("view-magazine-reader");
+    const controls = document.getElementById("pdf-controls-bar");
+    const scrollEl = document.getElementById("pdf-pages-scroll");
+
+    const controlsH = controls?.offsetHeight || 0;
+    const vv = window.visualViewport;
+    const availH = vv ? vv.height : window.innerHeight;
+    const slotH = Math.max(availH - controlsH, 180);
+
+    const root = document.documentElement;
+    root.style.setProperty("--reader-controls-h", `${controlsH}px`);
+    root.style.setProperty("--pdf-page-slot-h", `${slotH}px`);
+
+    if (readerView) {
+      readerView.style.height = `${availH}px`;
+    }
+    if (scrollEl) {
+      scrollEl.style.height = `${Math.max(availH - controlsH, 0)}px`;
+    }
+  }
+
+  clearMagazineReaderLayout() {
+    const root = document.documentElement;
+    const readerView = document.getElementById("view-magazine-reader");
+    const scrollEl = document.getElementById("pdf-pages-scroll");
+    root.style.removeProperty("--reader-controls-h");
+    root.style.removeProperty("--pdf-page-slot-h");
+    if (readerView) readerView.style.removeProperty("height");
+    if (scrollEl) scrollEl.style.removeProperty("height");
+  }
+
+  getPdfPageSlotSize() {
+    const scrollEl = document.getElementById("pdf-pages-scroll");
+    const pad = window.innerWidth < 768 ? 12 : 20;
+
+    const slotH = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--pdf-page-slot-h")
+    ) || (scrollEl?.clientHeight ?? window.innerHeight * 0.7);
+
+    const slotW = scrollEl?.clientWidth ?? window.innerWidth;
+
+    return {
+      width: Math.max(slotW - pad, 100),
+      height: Math.max(slotH - pad, 100)
+    };
+  }
+
+  async renderPdfPageToCanvas(num, canvas) {
+    if (!this.pdfDoc || !canvas) return;
+
+    const page = await this.pdfDoc.getPage(num);
+    const { width: maxW, height: maxH } = this.getPdfPageSlotSize();
+
+    let viewport = page.getViewport({ scale: 1.0 });
+    const scaleW = maxW / viewport.width;
+    const scaleH = maxH / viewport.height;
+    const fitScale = Math.min(scaleW, scaleH) * this.pdfZoomScale;
+    viewport = page.getViewport({ scale: fitScale });
+
+    const context = canvas.getContext("2d");
+    const outputScale = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(viewport.width * outputScale);
+    canvas.height = Math.floor(viewport.height * outputScale);
+    canvas.style.width = `${viewport.width}px`;
+    canvas.style.height = `${viewport.height}px`;
+
+    context.setTransform(outputScale, 0, 0, outputScale, 0, 0);
+    await page.render({ canvasContext: context, viewport }).promise;
+  }
+
+  async rerenderAllPdfPages() {
     if (!this.pdfDoc) return;
     this.pdfIsRendering = true;
 
-    try {
-      const page = await this.pdfDoc.getPage(num);
-      const canvas = document.getElementById("pdf-render-canvas");
-      if (!canvas) return;
-
-      const container = document.getElementById("pdf-canvas-container");
-      const containerWidth = container ? container.clientWidth : 800;
-
-      // Calculate viewport at scale 1.0 first
-      let viewport = page.getViewport({ scale: 1.0 });
-
-      // Determine scaling factor to fit the container's width (full-width)
-      // We also apply the user's interactive zoom scale
-      const fitScale = (containerWidth - 20) / viewport.width;
-      const finalScale = fitScale * this.pdfZoomScale;
-
-      viewport = page.getViewport({ scale: finalScale });
-      const context = canvas.getContext("2d");
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport
-      };
-
-      await page.render(renderContext).promise;
+    const scrollEl = document.getElementById("pdf-pages-scroll");
+    if (!scrollEl) {
       this.pdfIsRendering = false;
+      return;
+    }
 
-      // Update current page inputs
-      const pageInput = document.getElementById("pdf-current-page");
-      if (pageInput) pageInput.value = num;
+    const savedPage = this.pdfCurrentPageNum;
 
-      if (this.pdfPagePendingNum !== null) {
-        const nextNum = this.pdfPagePendingNum;
-        this.pdfPagePendingNum = null;
-        this.renderPdfPage(nextNum);
+    try {
+      for (let i = 1; i <= this.pdfDoc.numPages; i++) {
+        const wrap = document.getElementById(`pdf-page-${i}`);
+        const canvas = wrap?.querySelector("canvas");
+        if (canvas) await this.renderPdfPageToCanvas(i, canvas);
       }
     } catch (err) {
-      console.error("PDF page rendering error:", err);
-      this.pdfIsRendering = false;
+      console.error("PDF render error:", err);
     }
+
+    this.pdfIsRendering = false;
+    this.updatePdfControls();
+    this.scrollToPdfPage(savedPage, false);
   }
 
-  queueRenderPdfPage(num) {
-    if (this.pdfIsRendering) {
-      this.pdfPagePendingNum = num;
-    } else {
-      this.renderPdfPage(num);
+  setupPdfPageObserver() {
+    if (this.pdfPageObserver) {
+      this.pdfPageObserver.disconnect();
+      this.pdfPageObserver = null;
     }
+
+    const scrollEl = document.getElementById("pdf-pages-scroll");
+    if (!scrollEl) return;
+
+    this.pdfPageObserver = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+
+        if (visible.length > 0) {
+          const pageNum = parseInt(visible[0].target.dataset.page, 10);
+          if (!isNaN(pageNum) && pageNum !== this.pdfCurrentPageNum) {
+            this.pdfCurrentPageNum = pageNum;
+            this.updatePdfControls();
+          }
+        }
+      },
+      { root: scrollEl, threshold: [0.35, 0.5, 0.65] }
+    );
+
+    scrollEl.querySelectorAll(".pdf-page-wrap").forEach((wrap) => {
+      this.pdfPageObserver.observe(wrap);
+    });
+  }
+
+  scrollToPdfPage(num, smooth = true) {
+    const pageEl = document.getElementById(`pdf-page-${num}`);
+    if (!pageEl) return;
+
+    this.pdfCurrentPageNum = num;
+    pageEl.scrollIntoView({ behavior: smooth ? "smooth" : "instant", block: "start" });
+    this.updatePdfControls();
+  }
+
+  updatePdfControls() {
+    if (!this.pdfDoc) return;
+
+    const totalPagesEl = document.getElementById("pdf-total-pages");
+    const currentPageEl = document.getElementById("pdf-current-page");
+    const prevBtn = document.getElementById("pdf-prev-btn");
+    const nextBtn = document.getElementById("pdf-next-btn");
+    const zoomLevelEl = document.getElementById("pdf-zoom-level");
+
+    if (totalPagesEl) totalPagesEl.innerText = this.pdfDoc.numPages;
+    if (currentPageEl) {
+      currentPageEl.value = this.pdfCurrentPageNum;
+      currentPageEl.max = this.pdfDoc.numPages;
+    }
+    if (zoomLevelEl) zoomLevelEl.innerText = `${Math.round(this.pdfZoomScale * 100)}%`;
+    if (prevBtn) prevBtn.disabled = this.pdfCurrentPageNum <= 1;
+    if (nextBtn) nextBtn.disabled = this.pdfCurrentPageNum >= this.pdfDoc.numPages;
   }
 
   pdfPrevPage() {
     if (!this.pdfDoc || this.pdfCurrentPageNum <= 1) return;
-    this.pdfCurrentPageNum--;
-    this.queueRenderPdfPage(this.pdfCurrentPageNum);
+    this.scrollToPdfPage(this.pdfCurrentPageNum - 1);
   }
 
   pdfNextPage() {
     if (!this.pdfDoc || this.pdfCurrentPageNum >= this.pdfDoc.numPages) return;
-    this.pdfCurrentPageNum++;
-    this.queueRenderPdfPage(this.pdfCurrentPageNum);
+    this.scrollToPdfPage(this.pdfCurrentPageNum + 1);
   }
 
   pdfGoToPage(val) {
-    let pageNum = parseInt(val);
+    let pageNum = parseInt(val, 10);
     if (!this.pdfDoc || isNaN(pageNum)) return;
 
     if (pageNum < 1) pageNum = 1;
     if (pageNum > this.pdfDoc.numPages) pageNum = this.pdfDoc.numPages;
 
-    this.pdfCurrentPageNum = pageNum;
-    this.queueRenderPdfPage(pageNum);
+    this.scrollToPdfPage(pageNum);
   }
 
-  pdfZoomIn() {
+  async pdfZoomIn() {
     if (!this.pdfDoc) return;
-    this.pdfZoomScale += 0.2;
-    if (this.pdfZoomScale > 3.0) this.pdfZoomScale = 3.0;
-    
-    const zoomLevelEl = document.getElementById("pdf-zoom-level");
-    if (zoomLevelEl) zoomLevelEl.innerText = `${Math.round(this.pdfZoomScale * 100)}%`;
-    
-    this.queueRenderPdfPage(this.pdfCurrentPageNum);
+    this.pdfZoomScale = Math.min(3.0, this.pdfZoomScale + 0.2);
+    await this.rerenderAllPdfPages();
   }
 
-  pdfZoomOut() {
+  async pdfZoomOut() {
     if (!this.pdfDoc) return;
-    this.pdfZoomScale -= 0.2;
-    if (this.pdfZoomScale < 0.5) this.pdfZoomScale = 0.5;
-
-    const zoomLevelEl = document.getElementById("pdf-zoom-level");
-    if (zoomLevelEl) zoomLevelEl.innerText = `${Math.round(this.pdfZoomScale * 100)}%`;
-
-    this.queueRenderPdfPage(this.pdfCurrentPageNum);
+    this.pdfZoomScale = Math.max(0.5, this.pdfZoomScale - 0.2);
+    await this.rerenderAllPdfPages();
   }
 
   closeMagazineReader() {
-    const modalEl = document.getElementById("magazine-reader-modal");
-    if (modalEl) modalEl.classList.remove("active");
+    const homeView = document.getElementById("view-home");
+    const readerView = document.getElementById("view-magazine-reader");
+    const scrollEl = document.getElementById("pdf-pages-scroll");
+
+    if (this.pdfPageObserver) {
+      this.pdfPageObserver.disconnect();
+      this.pdfPageObserver = null;
+    }
+
+    readerView?.classList.remove("active");
+    homeView?.classList.add("active");
+    document.body.classList.remove("magazine-reader-active");
+    this.clearMagazineReaderLayout();
+
+    if (scrollEl) scrollEl.innerHTML = "";
 
     this.pdfDoc = null;
     this.pdfCurrentPageNum = 1;
     this.pdfZoomScale = 1.0;
     this.pdfIsRendering = false;
     this.pdfPagePendingNum = null;
+    this.activeMagazineProject = null;
 
-    document.body.style.overflow = "";
+    const projectsSection = document.getElementById("projects-grid-section");
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   /* ==========================================================================
@@ -686,7 +870,7 @@ class UrbanBuildsApp {
         if (project.videoSrcType === "mock" || project.mockVideoUrl || project.videoUrl.includes(".mp4")) {
           const videoSrc = project.mockVideoUrl || project.videoUrl;
           videoContainer.innerHTML = `
-            <video controls autoplay class="modal-video-player" style="width:100%; height:100%; object-fit:cover;">
+            <video controls autoplay playsinline disablePictureInPicture controlsList="nodownload noremoteplayback" class="modal-video-player" oncontextmenu="return false;">
               <source src="${videoSrc}" type="video/mp4">
               Your browser does not support HTML5 video walkthrough playback.
             </video>
@@ -697,8 +881,9 @@ class UrbanBuildsApp {
           if (embedUrl.includes("watch?v=")) {
             embedUrl = embedUrl.replace("watch?v=", "embed/");
           }
+          const ytSep = embedUrl.includes("?") ? "&" : "?";
           videoContainer.innerHTML = `
-            <iframe src="${embedUrl}?autoplay=1&mute=1" allow="autoplay; encrypted-media" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
+            <iframe src="${embedUrl}${ytSep}autoplay=1&mute=1&modestbranding=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>
           `;
         }
       }
@@ -908,6 +1093,20 @@ class UrbanBuildsApp {
 
 // Boot Client App
 const app = new UrbanBuildsApp();
+
+if ("scrollRestoration" in history) {
+  history.scrollRestoration = "manual";
+}
+
 window.addEventListener("DOMContentLoaded", () => {
+  app.resetPageScroll();
   app.init();
+});
+
+window.addEventListener("load", () => {
+  app.resetPageScroll();
+});
+
+window.addEventListener("pageshow", () => {
+  app.resetPageScroll();
 });

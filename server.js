@@ -7,10 +7,19 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// JSON body limit (base64 inflates file size ~33%; videos need more headroom)
+const UPLOAD_BODY_LIMIT = process.env.UPLOAD_BODY_LIMIT || '250mb';
+
 // Enable CORS and Body Parser
 app.use(cors());
-app.use(bodyParser.json({ limit: '50mb' })); // Allows base64 image uploads up to 50MB
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: UPLOAD_BODY_LIMIT }));
+app.use(bodyParser.urlencoded({ limit: UPLOAD_BODY_LIMIT, extended: true }));
+
+// Disable aggressive browser caching for development
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  next();
+});
 
 // Serve static assets from front-end public folder
 app.use(express.static(path.join(__dirname, 'public')));
@@ -213,10 +222,17 @@ app.post('/api/categories', requireAdminAuth, (req, res) => {
   res.json({ success: true, message: "Navbar categories updated successfully on server.", categories: newCategories });
 });
 
+// Shared upload payload parser (supports legacy field aliases)
+const parseUploadPayload = (body = {}) => {
+  const filename = body.filename || body.name;
+  const base64Data = body.base64Data || body.base64 || body.data;
+  return { filename, base64Data };
+};
+
 // 11. POST Video Upload (Requires Auth)
 app.post('/api/upload-video', requireAdminAuth, (req, res) => {
-  const { filename, base64Data } = req.body;
-  
+  const { filename, base64Data } = parseUploadPayload(req.body);
+
   if (!filename || !base64Data) {
     return res.status(400).json({ success: false, message: "Filename and base64Data are required." });
   }
@@ -244,8 +260,8 @@ app.post('/api/upload-video', requireAdminAuth, (req, res) => {
 
 // 12. POST PDF Upload (Requires Auth)
 app.post('/api/upload-pdf', requireAdminAuth, (req, res) => {
-  const { filename, base64Data } = req.body;
-  
+  const { filename, base64Data } = parseUploadPayload(req.body);
+
   if (!filename || !base64Data) {
     return res.status(400).json({ success: false, message: "Filename and base64Data are required." });
   }
@@ -273,8 +289,8 @@ app.post('/api/upload-pdf', requireAdminAuth, (req, res) => {
 
 // 13. POST Photo Upload (Requires Auth)
 app.post('/api/upload-photo', requireAdminAuth, (req, res) => {
-  const { filename, base64Data } = req.body;
-  
+  const { filename, base64Data } = parseUploadPayload(req.body);
+
   if (!filename || !base64Data) {
     return res.status(400).json({ success: false, message: "Filename and base64Data are required." });
   }
@@ -311,6 +327,14 @@ app.use('/api', (req, res, next) => {
 // Custom Error Handling Middleware for standard JSON errors (e.g. body-parser limit exceeded)
 app.use((err, req, res, next) => {
   console.error("Express Server Error:", err);
+
+  if (err.type === 'entity.too.large' || err.status === 413) {
+    return res.status(413).json({
+      success: false,
+      message: `Upload is too large. Maximum request size is ${UPLOAD_BODY_LIMIT}. Use a smaller or compressed video file.`
+    });
+  }
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "An unexpected server error occurred."

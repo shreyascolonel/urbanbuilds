@@ -52,6 +52,10 @@ html[data-theme="light"] {
   padding: 0;
 }
 
+html {
+  scroll-behavior: auto;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background: var(--bg-color);
@@ -59,6 +63,7 @@ body {
   color: var(--text-color);
   min-height: 100vh;
   overflow-x: hidden;
+  overflow-anchor: none;
   transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
   line-height: 1.6;
 }
@@ -411,11 +416,11 @@ main {
 }
 
 .hero-glass-card {
-  max-width: 650px;
-  padding: 40px;
-  border-radius: 20px;
+  max-width: 520px;
+  padding: 28px 30px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transform: translateY(30px);
+  transform: translateY(20px);
   animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -426,17 +431,17 @@ main {
 .hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255, 149, 0, 0.15);
   border: 1px solid rgba(255, 149, 0, 0.3);
   color: var(--primary-color);
-  padding: 6px 14px;
+  padding: 5px 12px;
   border-radius: 30px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
 }
 
 .auth-header {
@@ -461,9 +466,9 @@ main {
 }
 
 .hero-title {
-  font-size: 52px;
-  line-height: 1.1;
-  margin-bottom: 15px;
+  font-size: 40px;
+  line-height: 1.12;
+  margin-bottom: 12px;
   font-weight: 800;
   color: #fff;
 }
@@ -473,14 +478,21 @@ html[data-theme="light"] .hero-title {
 }
 
 .hero-description {
-  font-size: 16px;
+  font-size: 14px;
+  line-height: 1.55;
   color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .hero-btn-group {
   display: flex;
-  gap: 15px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.hero-glass-card .btn-lg {
+  padding: 12px 22px;
+  font-size: 14px;
 }
 
 /* Override outline color for hero */
@@ -953,6 +965,19 @@ html[data-theme="light"] .hero-title {
   width: 100%;
   height: 100%;
   border: none;
+}
+
+/* Hide download control on native HTML5 video players */
+video.modal-video-player::-webkit-media-controls-enclosure {
+  overflow: hidden;
+}
+
+video.modal-video-player::-internal-media-controls-download-button {
+  display: none;
+}
+
+video.modal-video-player::-webkit-media-controls-download-button {
+  display: none;
 }
 
 .media-title {
@@ -1611,54 +1636,334 @@ html[data-theme="light"] .hero-banner .btn-outline:hover {
   opacity: 1;
 }
 
-/* Magazine Reader Portrait Modal overrides */
-.magazine-modal-card {
-  width: 90vw;
-  height: 92vh;
-  max-width: 850px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  background: rgba(15, 15, 15, 0.96) !important;
-  border: 1px solid rgba(255, 149, 0, 0.25) !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+/* ==========================================================================
+   Full-width Magazine PDF Reader (inline view, no modal)
+   Uses 100dvh + visualViewport metrics for iOS/Android browser chrome
+   ========================================================================== */
+
+:root {
+  --reader-controls-h: 68px;
+  --pdf-page-slot-h: 500px;
 }
 
-@media (max-width: 768px) {
-  .magazine-modal-card {
-    width: 100vw !important;
-    height: 100vh !important;
-    max-width: 100% !important;
-    border-radius: 0 !important;
-    padding: 15px !important;
-    border: none !important;
+body.magazine-reader-active {
+  overflow: hidden;
+  height: 100%;
+  height: 100dvh;
+}
+
+/* Full-screen reader: hide site chrome */
+body.magazine-reader-active .main-header {
+  display: none !important;
+}
+
+body.magazine-reader-active main {
+  margin-top: 0 !important;
+  height: 100dvh !important;
+  height: 100vh !important;
+  max-height: 100dvh !important;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+body.magazine-reader-active .main-footer,
+body.magazine-reader-active .whatsapp-float-btn {
+  display: none;
+}
+
+.magazine-reader-view.active {
+  display: flex !important;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  height: 100dvh;
+  height: 100vh;
+  min-height: 100dvh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 900;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Always-visible floating back (top-left) */
+.magazine-float-back {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top, 0px));
+  left: max(12px, env(safe-area-inset-left, 0px));
+  z-index: 1100;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--panel-bg) !important;
+  color: var(--text-color);
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.magazine-float-back:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.magazine-float-back i {
+  font-size: 15px;
+}
+
+.magazine-reader-scroll {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  scroll-snap-type: y mandatory;
+  background: #0a0a0c;
+}
+
+html[data-theme="light"] .magazine-reader-scroll {
+  background: #e8e6e1;
+}
+
+.pdf-page-wrap {
+  width: 100%;
+  min-height: var(--pdf-page-slot-h, 100%);
+  height: var(--pdf-page-slot-h, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background: #0a0a0c;
+  box-sizing: border-box;
+}
+
+html[data-theme="light"] .pdf-page-wrap {
+  background: #e8e6e1;
+}
+
+.pdf-page-wrap + .pdf-page-wrap {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="light"] .pdf-page-wrap + .pdf-page-wrap {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.pdf-page-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.35);
+}
+
+.pdf-controls-bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  padding: 10px 16px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  background: rgba(12, 12, 14, 0.98) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 70;
+}
+
+html[data-theme="light"] .pdf-controls-bar {
+  background: rgba(250, 249, 246, 0.98) !important;
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.pdf-nav-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--panel-bg);
+  color: var(--text-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+  padding: 0;
+  font-size: 16px;
+}
+
+.pdf-nav-btn:hover:not(:disabled) {
+  background: var(--panel-hover);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.pdf-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pdf-page-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color);
+  font-family: 'Outfit', sans-serif;
+}
+
+.pdf-page-indicator input[type="number"] {
+  width: 52px;
+  text-align: center;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  border-radius: 6px;
+  padding: 8px 6px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  -moz-appearance: textfield;
+}
+
+.pdf-page-indicator input[type="number"]::-webkit-outer-spin-button,
+.pdf-page-indicator input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.pdf-page-label {
+  display: none;
+}
+
+.pdf-controls-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border-color);
+  margin: 0 2px;
+}
+
+.pdf-zoom-level {
+  font-size: 13px;
+  min-width: 40px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.pdf-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.92);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  gap: 16px;
+}
+
+.pdf-loading-overlay.active {
+  display: flex;
+}
+
+.pdf-loading-overlay i {
+  font-size: 40px;
+  color: var(--primary-color);
+}
+
+.pdf-loading-overlay span {
+  font-weight: 500;
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-color);
+  font-size: 16px;
+}
+
+/* Tablet */
+@media (min-width: 600px) {
+  .pdf-page-wrap {
+    padding: 8px 16px;
+  }
+
+  .pdf-page-label {
+    display: inline;
+  }
+
+  .pdf-controls-bar {
+    gap: 14px 18px;
+    padding: 12px 24px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
   }
 }
 
-.magazine-reader-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  gap: 15px;
+/* Desktop / Web */
+@media (min-width: 1024px) {
+  .pdf-page-wrap {
+    padding: 10px 24px;
+  }
+
+  .pdf-controls-bar {
+    gap: 16px 20px;
+    padding: 12px 32px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  }
 }
 
-.magazine-title-heading {
-  font-family: 'Outfit', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-color);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+/* Mobile */
+@media (max-width: 599px) {
+  .magazine-float-back-label {
+    display: none;
+  }
 
-.pdf-iframe-wrapper {
-  flex: 1;
-  border-radius: 12px;
-  overflow: hidden;
-  background: #141414;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  .magazine-float-back {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .pdf-controls-divider {
+    display: none;
+  }
+
+  .pdf-zoom-btn,
+  .pdf-zoom-level {
+    display: none;
+  }
+
+  .pdf-page-indicator {
+    font-size: 13px;
+  }
+
+  .pdf-page-indicator input[type="number"] {
+    width: 44px;
+    padding: 6px 4px;
+  }
 }
 
 /* Floating WhatsApp Contact Widget */
@@ -2221,13 +2526,26 @@ body {
 
 /* Large screens adjustment */
 @media (max-width: 1400px) {
-  .hero-title { font-size: 46px; }
+  .hero-title { font-size: 36px; }
+  .hero-glass-card { max-width: 480px; }
+}
+
+/* Tablets (landscape and portrait) — compact showcase card */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero-banner { height: 58vh; }
+  .hero-glass-card {
+    max-width: 380px;
+    padding: 22px 24px;
+    border-radius: 14px;
+  }
+  .hero-title { font-size: 30px; }
+  .hero-description { font-size: 13px; margin-bottom: 16px; }
+  .hero-badge { font-size: 10px; margin-bottom: 12px; }
+  .hero-glass-card .btn-lg { padding: 10px 18px; font-size: 13px; }
 }
 
 /* Tablets (landscape and portrait) */
 @media (max-width: 1024px) {
-  .hero-banner { height: 60vh; }
-  .hero-title { font-size: 38px; }
   .project-detail-grid {
     grid-template-columns: 1fr;
     gap: 30px;
@@ -2322,12 +2640,29 @@ body {
     display: none !important;
   }
   
-  .hero-banner { height: 50vh; }
-  .hero-glass-card { padding: 25px; }
-  .hero-title { font-size: 28px; }
-  .hero-description { font-size: 14px; margin-bottom: 20px; }
-  .hero-btn-group { flex-direction: column; gap: 10px; }
-  .btn-lg { padding: 12px 20px; font-size: 14px; }
+  .hero-banner {
+    height: 55vh;
+    align-items: flex-end;
+  }
+
+  /* Hide showcase card on mobile so hero video is fully visible */
+  .hero-content-wrapper,
+  .hero-glass-card {
+    display: none !important;
+  }
+
+  #projects-grid-section {
+    scroll-margin-top: 140px;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      to top,
+      var(--bg-color) 0%,
+      rgba(0, 0, 0, 0.12) 45%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+  }
   
   .search-filter-section { margin-top: -20px; }
   .search-filter-wrapper {
@@ -2531,4 +2866,19 @@ html[data-theme='light'] .admin-auth-screen {
   font-size: 11px;
   color: var(--text-muted);
   margin-top: 6px;
+}
+
+/* Magazine reader: full viewport on mobile (iOS / Android) */
+@media (max-width: 768px) {
+  body.magazine-reader-active.has-nav main,
+  body.magazine-reader-active main {
+    margin-top: 0 !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding-bottom: 0 !important;
+  }
+
+  body.magazine-reader-active {
+    padding-bottom: 0 !important;
+  }
 }

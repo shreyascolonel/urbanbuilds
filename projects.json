@@ -3,17 +3,17 @@
     "id": "p1",
     "title": "The Courtyard House",
     "category": "Design Tour",
-    "architect": "Studio Space & Form",
+    "architect": "",
     "location": "Bangalore, Karnataka",
-    "budget": "₹1.8 Crores",
-    "budgetRange": "1cr-2cr",
+    "budget": "",
+    "budgetRange": "",
     "area": "3,800 sq ft",
     "areaRange": "3000-5000",
     "style": "Modern Minimalist",
     "heroImage": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
-    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "videoUrl": "/uploads/Fortuna - Cinimatic.mp4",
     "videoSrcType": "mock",
-    "mockVideoUrl": "https://assets.mixkit.co/videos/preview/mixkit-modern-apartment-interior-design-39933-large.mp4",
+    "mockVideoUrl": "/uploads/Fortuna - Cinimatic.mp4",
     "gallery": [
       "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80",
@@ -24,8 +24,8 @@
     "details": {
       "bhk": "4 BHK",
       "orientation": "East Facing",
-      "costBreakdown": "₹1.4 Cr Structure + ₹40 Lakhs Interiors",
       "year": "2024",
+      "costBreakdown": "",
       "description": "Designed around a central open-to-sky double-height courtyard, this home blends outdoor elements with internal spaces. The clean lines, natural light, and organic wooden textures create an oasis of calm within the busy urban environment. The home features passive cooling systems and green architectural techniques."
     },
     "materials": [
@@ -55,7 +55,7 @@
         "material": "Teak Wood & Handwoven Rattan"
       }
     ],
-    "floorPlan": "\n      <svg viewBox=\"0 0 800 500\" class=\"vector-floor-plan\">\n        <style>\n          .wall { stroke: var(--text-color); stroke-width: 5; fill: none; stroke-linecap: round; }\n          .thin-wall { stroke: var(--text-color); stroke-width: 2.5; fill: none; opacity: 0.7; }\n          .door { stroke: var(--primary-color); stroke-width: 2.5; fill: none; }\n          .room-label { fill: var(--text-color); font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; text-anchor: middle; }\n          .room-dims { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 11px; text-anchor: middle; }\n          .furniture { fill: rgba(255, 149, 0, 0.08); stroke: rgba(255, 149, 0, 0.4); stroke-width: 1.5; }\n        </style>\n        <!-- Outer Wall Boundary -->\n        <rect x=\"50\" y=\"50\" width=\"700\" height=\"400\" rx=\"10\" class=\"wall\" />\n        \n        <!-- Room Dividers -->\n        <!-- Courtyard in Center -->\n        <rect x=\"300\" y=\"150\" width=\"200\" height=\"200\" rx=\"8\" class=\"wall\" style=\"stroke-dasharray: 8 5; fill: rgba(0,0,0,0.03);\" />\n        \n        <!-- Living Room Left -->\n        <line x1=\"300\" y1=\"50\" x2=\"300\" y2=\"350\" class=\"wall\" />\n        <!-- Master Bedroom Right -->\n        <line x1=\"500\" y1=\"50\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <!-- Kitchen Bottom -->\n        <line x1=\"300\" y1=\"350\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <line x1=\"400\" y1=\"350\" x2=\"400\" y2=\"450\" class=\"wall\" />\n        \n        <!-- Furniture Blocks -->\n        <!-- Sofa in Living -->\n        <rect x=\"80\" y=\"150\" width=\"40\" height=\"120\" rx=\"4\" class=\"furniture\" />\n        <rect x=\"130\" y=\"190\" width=\"80\" height=\"40\" rx=\"4\" class=\"furniture\" />\n        \n        <!-- Bed in Master Bed -->\n        <rect x=\"580\" y=\"120\" width=\"120\" height=\"100\" rx=\"6\" class=\"furniture\" />\n        \n        <!-- Dining Table in Courtyard -->\n        <rect x=\"360\" y=\"220\" width=\"80\" height=\"60\" rx=\"4\" class=\"furniture\" />\n        <circle cx=\"345\" cy=\"250\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"455\" cy=\"250\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"400\" cy=\"205\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"400\" cy=\"295\" r=\"8\" class=\"furniture\" />\n        \n        <!-- Doors -->\n        <!-- Main Entry -->\n        <path d=\"M 50 400 A 50 50 0 0 1 100 450\" class=\"door\" />\n        <!-- Bedroom Entry -->\n        <path d=\"M 500 300 A 40 40 0 0 1 540 340\" class=\"door\" />\n        \n        <!-- Labels -->\n        <text x=\"175\" y=\"200\" class=\"room-label\">LIVING ROOM</text>\n        <text x=\"175\" y=\"220\" class=\"room-dims\">16'0\" x 24'0\"</text>\n        \n        <text x=\"400\" y=\"180\" class=\"room-label\" style=\"fill: var(--primary-color);\">COURTYARD</text>\n        <text x=\"400\" y=\"198\" class=\"room-dims\" style=\"fill: var(--primary-color);\">12'0\" x 12'0\" (Open to Sky)</text>\n        \n        <text x=\"625\" y=\"200\" class=\"room-label\">MASTER BEDROOM</text>\n        <text x=\"625\" y=\"220\" class=\"room-dims\">18'0\" x 14'0\"</text>\n        \n        <text x=\"350\" y=\"400\" class=\"room-label\">KITCHEN</text>\n        <text x=\"350\" y=\"418\" class=\"room-dims\">10'0\" x 12'0\"</text>\n        \n        <text x=\"450\" y=\"400\" class=\"room-label\">FOYER</text>\n        <text x=\"450\" y=\"418\" class=\"room-dims\">8'0\" x 12'0\"</text>\n      </svg>\n    "
+    "floorPlan": "<svg viewBox=\"0 0 800 500\" class=\"vector-floor-plan\">\n        <style>\n          .wall { stroke: var(--text-color); stroke-width: 5; fill: none; stroke-linecap: round; }\n          .thin-wall { stroke: var(--text-color); stroke-width: 2.5; fill: none; opacity: 0.7; }\n          .door { stroke: var(--primary-color); stroke-width: 2.5; fill: none; }\n          .room-label { fill: var(--text-color); font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 14px; text-anchor: middle; }\n          .room-dims { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 11px; text-anchor: middle; }\n          .furniture { fill: rgba(255, 149, 0, 0.08); stroke: rgba(255, 149, 0, 0.4); stroke-width: 1.5; }\n        </style>\n        <!-- Outer Wall Boundary -->\n        <rect x=\"50\" y=\"50\" width=\"700\" height=\"400\" rx=\"10\" class=\"wall\" />\n        \n        <!-- Room Dividers -->\n        <!-- Courtyard in Center -->\n        <rect x=\"300\" y=\"150\" width=\"200\" height=\"200\" rx=\"8\" class=\"wall\" style=\"stroke-dasharray: 8 5; fill: rgba(0,0,0,0.03);\" />\n        \n        <!-- Living Room Left -->\n        <line x1=\"300\" y1=\"50\" x2=\"300\" y2=\"350\" class=\"wall\" />\n        <!-- Master Bedroom Right -->\n        <line x1=\"500\" y1=\"50\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <!-- Kitchen Bottom -->\n        <line x1=\"300\" y1=\"350\" x2=\"500\" y2=\"350\" class=\"wall\" />\n        <line x1=\"400\" y1=\"350\" x2=\"400\" y2=\"450\" class=\"wall\" />\n        \n        <!-- Furniture Blocks -->\n        <!-- Sofa in Living -->\n        <rect x=\"80\" y=\"150\" width=\"40\" height=\"120\" rx=\"4\" class=\"furniture\" />\n        <rect x=\"130\" y=\"190\" width=\"80\" height=\"40\" rx=\"4\" class=\"furniture\" />\n        \n        <!-- Bed in Master Bed -->\n        <rect x=\"580\" y=\"120\" width=\"120\" height=\"100\" rx=\"6\" class=\"furniture\" />\n        \n        <!-- Dining Table in Courtyard -->\n        <rect x=\"360\" y=\"220\" width=\"80\" height=\"60\" rx=\"4\" class=\"furniture\" />\n        <circle cx=\"345\" cy=\"250\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"455\" cy=\"250\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"400\" cy=\"205\" r=\"8\" class=\"furniture\" />\n        <circle cx=\"400\" cy=\"295\" r=\"8\" class=\"furniture\" />\n        \n        <!-- Doors -->\n        <!-- Main Entry -->\n        <path d=\"M 50 400 A 50 50 0 0 1 100 450\" class=\"door\" />\n        <!-- Bedroom Entry -->\n        <path d=\"M 500 300 A 40 40 0 0 1 540 340\" class=\"door\" />\n        \n        <!-- Labels -->\n        <text x=\"175\" y=\"200\" class=\"room-label\">LIVING ROOM</text>\n        <text x=\"175\" y=\"220\" class=\"room-dims\">16'0\" x 24'0\"</text>\n        \n        <text x=\"400\" y=\"180\" class=\"room-label\" style=\"fill: var(--primary-color);\">COURTYARD</text>\n        <text x=\"400\" y=\"198\" class=\"room-dims\" style=\"fill: var(--primary-color);\">12'0\" x 12'0\" (Open to Sky)</text>\n        \n        <text x=\"625\" y=\"200\" class=\"room-label\">MASTER BEDROOM</text>\n        <text x=\"625\" y=\"220\" class=\"room-dims\">18'0\" x 14'0\"</text>\n        \n        <text x=\"350\" y=\"400\" class=\"room-label\">KITCHEN</text>\n        <text x=\"350\" y=\"418\" class=\"room-dims\">10'0\" x 12'0\"</text>\n        \n        <text x=\"450\" y=\"400\" class=\"room-label\">FOYER</text>\n        <text x=\"450\" y=\"418\" class=\"room-dims\">8'0\" x 12'0\"</text>\n      </svg>"
   },
   {
     "id": "p2",
@@ -412,5 +412,33 @@
     },
     "pdfUrl": "/uploads/document.pdf",
     "id": "p_1779470109526"
+  },
+  {
+    "title": "Hettich",
+    "architect": "Urban Builds Curated",
+    "location": "Editorial",
+    "category": "Material Boards",
+    "style": "Editorial Select",
+    "budget": "N/A",
+    "budgetRange": "1cr-2cr",
+    "area": "N/A",
+    "areaRange": "1500-3000",
+    "heroImage": "/uploads/BACK2.png",
+    "videoUrl": "",
+    "videoSrcType": "",
+    "mockVideoUrl": "",
+    "gallery": [
+      "/uploads/BACK2.png"
+    ],
+    "materials": [],
+    "details": {
+      "bhk": "",
+      "orientation": "",
+      "year": "",
+      "costBreakdown": "",
+      "description": "Premium curated design catalog."
+    },
+    "pdfUrl": "/uploads/document.pdf",
+    "id": "p_1779553576711"
   }
 ]

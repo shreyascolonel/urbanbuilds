@@ -9,6 +9,10 @@ class UrbanBuildsAdmin {
     this.projects = [];
     this.formMaterialRows = [];
     this.sessionTokenKey = "ub_admin_token";
+    // Raw file limits (base64 adds ~33% — keep under server UPLOAD_BODY_LIMIT)
+    this.maxVideoFileBytes = 150 * 1024 * 1024; // 150 MB
+    this.maxImageFileBytes = 25 * 1024 * 1024;  // 25 MB
+    this.maxPdfFileBytes = 50 * 1024 * 1024;    // 50 MB
   }
 
   async init() {
@@ -34,6 +38,177 @@ class UrbanBuildsAdmin {
     document.documentElement.setAttribute("data-theme", newTheme);
     localStorage.setItem("ub_theme", newTheme);
     this.showToast(`Theme switched to ${newTheme.toUpperCase()}`, "info");
+  }
+
+  extractBase64FromDataUrl(dataUrl) {
+    if (!dataUrl || typeof dataUrl !== "string") return "";
+    const commaIndex = dataUrl.indexOf(",");
+    return commaIndex >= 0 ? dataUrl.slice(commaIndex + 1) : dataUrl;
+  }
+
+  safeUploadFilename(file, fallbackExt = "bin") {
+    if (file.name && file.name.trim()) return file.name.trim();
+    const ext = (file.type && file.type.split("/")[1]) || fallbackExt;
+    return `upload_${Date.now()}.${ext.replace(/[^a-z0-9]/gi, "")}`;
+  }
+
+  validateFileSize(file, maxBytes, label = "File") {
+    if (!file || !file.size) return true;
+    if (file.size <= maxBytes) return true;
+    const maxMb = Math.round(maxBytes / (1024 * 1024));
+    const fileMb = (file.size / (1024 * 1024)).toFixed(1);
+    this.showToast(`${label} is too large (${fileMb} MB). Maximum is ${maxMb} MB.`, "error");
+    return false;
+  }
+
+  readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64Data = this.extractBase64FromDataUrl(reader.result);
+        const filename = this.safeUploadFilename(file);
+        if (!base64Data) {
+          reject(new Error("Could not read file contents."));
+          return;
+        }
+        resolve({ filename, base64Data });
+      };
+      reader.onerror = () => reject(reader.error || new Error("FileReader failed."));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  setUploadHudState({ title, filename, percent, status, success, error }) {
+    const hud = document.getElementById("upload-progress-hud");
+    const titleEl = document.getElementById("hud-title");
+    const filenameEl = document.getElementById("hud-filename");
+    const progressBar = document.getElementById("hud-progress-bar");
+    const percentageText = document.getElementById("hud-percentage");
+    const statusText = document.getElementById("hud-status-text");
+    const iconContainer = document.getElementById("hud-icon-container");
+
+    if (hud) {
+      hud.style.display = "flex";
+      hud.style.opacity = "1";
+    }
+    if (titleEl && title) titleEl.innerText = title;
+    if (filenameEl && filename) filenameEl.innerText = filename;
+    if (progressBar && percent != null) {
+      progressBar.style.width = `${percent}%`;
+      progressBar.style.background = error
+        ? "linear-gradient(90deg, #d32f2f, #f44336)"
+        : success
+          ? "linear-gradient(90deg, #2e7d32, #4caf50)"
+          : "linear-gradient(90deg, #ff9500, #ff5e00)";
+    }
+    if (percentageText && percent != null) percentageText.innerText = `${percent}%`;
+    if (statusText && status) statusText.innerText = status;
+    if (iconContainer) {
+      if (success) {
+        iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        iconContainer.style.color = "#4caf50";
+      } else if (error) {
+        iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        iconContainer.style.color = "#f44336";
+      } else {
+        iconContainer.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i>';
+        iconContainer.style.color = "var(--color-primary, #ff9500)";
+      }
+    }
+  }
+
+  hideUploadHud(delayMs = 300) {
+    const hud = document.getElementById("upload-progress-hud");
+    if (!hud) return;
+    hud.style.opacity = "0";
+    setTimeout(() => {
+      hud.style.display = "none";
+    }, delayMs);
+  }
+
+  async uploadWithProgress(endpoint, filename, base64Data, customTitle = "Uploading Content...") {
+    const safeFilename = (filename && String(filename).trim()) || `upload_${Date.now()}.bin`;
+    const payload = (base64Data && String(base64Data).trim()) || "";
+
+    if (!payload) {
+      this.showToast("Could not read file data. Please try again.", "error");
+      return { success: false, message: "File data could not be read." };
+    }
+
+    const token = sessionStorage.getItem(this.sessionTokenKey);
+    if (!token) {
+      this.showToast("Please log in again before uploading.", "error");
+      return { success: false, message: "Unauthorized. Valid credentials session required." };
+    }
+
+    this.setUploadHudState({
+      title: customTitle,
+      filename: safeFilename,
+      percent: 10,
+      status: "Preparing upload..."
+    });
+
+    try {
+      this.setUploadHudState({
+        title: customTitle,
+        filename: safeFilename,
+        percent: 40,
+        status: "Uploading to server..."
+      });
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: this.getAuthHeaders(),
+        body: JSON.stringify({ filename: safeFilename, base64Data: payload })
+      });
+
+      let data = null;
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        console.error("Upload response parse error:", parseErr);
+      }
+
+      if (response.ok && data && data.success) {
+        this.setUploadHudState({
+          title: "Upload Complete!",
+          filename: safeFilename,
+          percent: 100,
+          status: "Completed successfully!",
+          success: true
+        });
+        await new Promise((r) => setTimeout(r, 600));
+        this.hideUploadHud();
+        return data;
+      }
+
+      let errMsg = (data && data.message) || `Upload failed (${response.status}).`;
+      if (response.status === 413) {
+        errMsg = "File is too large for the server. Use a smaller or compressed video (under 150 MB).";
+      }
+      this.setUploadHudState({
+        title: "Sync Error",
+        filename: safeFilename,
+        percent: 100,
+        status: errMsg,
+        error: true
+      });
+      await new Promise((r) => setTimeout(r, 1200));
+      this.hideUploadHud();
+      return { success: false, message: errMsg };
+    } catch (err) {
+      console.error("Upload network error:", err);
+      this.setUploadHudState({
+        title: "Network Error",
+        filename: safeFilename,
+        percent: 100,
+        status: "Network transmission error",
+        error: true
+      });
+      await new Promise((r) => setTimeout(r, 1200));
+      this.hideUploadHud();
+      return { success: false, message: "Network transmission error" };
+    }
   }
 
   async handleLogin(event) {
@@ -270,110 +445,92 @@ class UrbanBuildsAdmin {
 
   async handlePdfUpload(input) {
     if (!input.files || input.files.length === 0) return;
-    
+
     const file = input.files[0];
     const statusLabel = document.getElementById("upload-pdf-status");
+    const isPdf = file.type === "application/pdf" || /\.pdf$/i.test(file.name || "");
 
-    if (file.type !== "application/pdf") {
+    if (!isPdf) {
       this.showToast("Please upload standard PDF documents only.", "error");
       if (statusLabel) statusLabel.innerText = "Error: Invalid file format";
       return;
     }
 
+    if (!this.validateFileSize(file, this.maxPdfFileBytes, "PDF")) {
+      if (statusLabel) statusLabel.innerText = "Error: File too large";
+      input.value = "";
+      return;
+    }
+
     if (statusLabel) statusLabel.innerText = "Reading file content...";
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64Data = reader.result.split(',')[1];
-        if (statusLabel) statusLabel.innerText = "Uploading to server...";
+    try {
+      const { filename, base64Data } = await this.readFileAsBase64(file);
+      if (statusLabel) statusLabel.innerText = "Uploading to server...";
 
-        const response = await fetch('/api/upload-pdf', {
-          method: 'POST',
-          headers: this.getAuthHeaders(),
-          body: JSON.stringify({ filename: file.name, base64Data })
-        });
+      const data = await this.uploadWithProgress("/api/upload-pdf", filename, base64Data, "Uploading PDF Document...");
 
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          this.showToast("PDF document uploaded successfully!", "success");
-          
-          const urlInput = document.getElementById("form-pdf-url");
-          if (urlInput) urlInput.value = data.url;
-
-          if (statusLabel) statusLabel.innerText = `Uploaded: ${file.name}`;
-        } else {
-          this.showToast(data.message || "PDF upload failed.", "error");
-          if (statusLabel) statusLabel.innerText = "Upload failed";
-        }
-      } catch (err) {
-        console.error("PDF reader save error:", err);
-        this.showToast("Failed to upload document PDF.", "error");
+      if (data && data.success) {
+        this.showToast("PDF document uploaded successfully!", "success");
+        const urlInput = document.getElementById("form-pdf-url");
+        if (urlInput) urlInput.value = data.url;
+        if (statusLabel) statusLabel.innerText = `Uploaded: ${filename}`;
+      } else {
+        this.showToast(data.message || "PDF upload failed.", "error");
         if (statusLabel) statusLabel.innerText = "Upload failed";
       }
-    };
+    } catch (err) {
+      console.error("PDF upload error:", err);
+      this.showToast(err.message || "Failed to upload document PDF.", "error");
+      if (statusLabel) statusLabel.innerText = "Upload failed";
+    }
 
-    reader.onerror = () => {
-      this.showToast("FileReader failed to process PDF.", "error");
-      if (statusLabel) statusLabel.innerText = "Read failed";
-    };
-
-    reader.readAsDataURL(file);
+    input.value = "";
   }
 
   async handleHeroUpload(input) {
     if (!input.files || input.files.length === 0) return;
-    
+
     const file = input.files[0];
     const statusLabel = document.getElementById("upload-hero-status");
+    const isImage = file.type.startsWith("image/") || /\.(jpe?g|png|gif|webp|bmp|svg|heic|heif)$/i.test(file.name || "");
 
-    if (!file.type.startsWith("image/")) {
+    if (!isImage) {
       this.showToast("Please upload image files only.", "error");
       if (statusLabel) statusLabel.innerText = "Error: Invalid file format";
       return;
     }
 
+    if (!this.validateFileSize(file, this.maxImageFileBytes, "Image")) {
+      if (statusLabel) statusLabel.innerText = "Error: File too large";
+      input.value = "";
+      return;
+    }
+
     if (statusLabel) statusLabel.innerText = "Reading file...";
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64Data = reader.result.split(',')[1];
-        if (statusLabel) statusLabel.innerText = "Uploading...";
+    try {
+      const { filename, base64Data } = await this.readFileAsBase64(file);
+      if (statusLabel) statusLabel.innerText = "Uploading...";
 
-        const response = await fetch('/api/upload-photo', {
-          method: 'POST',
-          headers: this.getAuthHeaders(),
-          body: JSON.stringify({ filename: file.name, base64Data })
-        });
+      const data = await this.uploadWithProgress("/api/upload-photo", filename, base64Data, "Uploading Cover Image...");
 
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          this.showToast("Hero cover image uploaded successfully!", "success");
-          
-          const urlInput = document.getElementById("form-hero-image");
-          if (urlInput) urlInput.value = data.url;
-
-          if (statusLabel) statusLabel.innerText = `Uploaded: ${file.name}`;
-        } else {
-          this.showToast(data.message || "Cover image upload failed.", "error");
-          if (statusLabel) statusLabel.innerText = "Upload failed";
-        }
-      } catch (err) {
-        console.error("Cover image upload error:", err);
-        this.showToast("Failed to upload cover image.", "error");
+      if (data && data.success) {
+        this.showToast("Hero cover image uploaded successfully!", "success");
+        const urlInput = document.getElementById("form-hero-image");
+        if (urlInput) urlInput.value = data.url;
+        if (statusLabel) statusLabel.innerText = `Uploaded: ${filename}`;
+      } else {
+        this.showToast(data.message || "Cover image upload failed.", "error");
         if (statusLabel) statusLabel.innerText = "Upload failed";
       }
-    };
+    } catch (err) {
+      console.error("Cover image upload error:", err);
+      this.showToast(err.message || "Failed to upload cover image.", "error");
+      if (statusLabel) statusLabel.innerText = "Upload failed";
+    }
 
-    reader.onerror = () => {
-      this.showToast("FileReader failed to process image.", "error");
-      if (statusLabel) statusLabel.innerText = "Read failed";
-    };
-
-    reader.readAsDataURL(file);
+    input.value = "";
   }
 
   renderGalleryPreviews() {
@@ -435,110 +592,113 @@ class UrbanBuildsAdmin {
 
   async handleGalleryUpload(input) {
     if (!input.files || input.files.length === 0) return;
-    
+
     const files = Array.from(input.files);
+    const statusLabel = document.getElementById("upload-gallery-status");
+    let successCount = 0;
     this.showToast(`Uploading ${files.length} gallery image(s)...`, "info");
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      if (!file.type.startsWith("image/")) {
-        this.showToast(`File ${file.name} is not an image. Skipping.`, "error");
+      const isImage = file.type.startsWith("image/") || /\.(jpe?g|png|gif|webp|bmp|svg|heic|heif)$/i.test(file.name || "");
+
+      if (!isImage) {
+        this.showToast(`File ${file.name || "unknown"} is not an image. Skipping.`, "error");
         continue;
       }
 
-      await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = async () => {
-          try {
-            const base64Data = reader.result.split(',')[1];
-            const response = await fetch('/api/upload-photo', {
-              method: 'POST',
-              headers: this.getAuthHeaders(),
-              body: JSON.stringify({ filename: file.name, base64Data })
-            });
+      if (!this.validateFileSize(file, this.maxImageFileBytes, file.name || "Image")) {
+        continue;
+      }
 
-            const data = await response.json();
+      if (statusLabel) {
+        statusLabel.innerText = `Uploading image ${i + 1} of ${files.length}...`;
+        statusLabel.style.color = "var(--color-primary, #ff9500)";
+      }
 
-            if (response.ok && data.success) {
-              const galleryTextArea = document.getElementById("form-gallery");
-              const currentVal = galleryTextArea.value.trim();
-              const separator = currentVal ? "\n" : "";
-              galleryTextArea.value = currentVal + separator + data.url;
-              this.renderGalleryPreviews();
-            } else {
-              this.showToast(`Failed to upload ${file.name}`, "error");
-            }
-          } catch (err) {
-            console.error(`Gallery upload error for ${file.name}:`, err);
-            this.showToast(`Error uploading ${file.name}`, "error");
-          }
-          resolve();
-        };
-        reader.onerror = () => {
-          this.showToast(`Failed to read file ${file.name}`, "error");
-          resolve();
-        };
-        reader.readAsDataURL(file);
-      });
+      try {
+        const { filename, base64Data } = await this.readFileAsBase64(file);
+        const data = await this.uploadWithProgress(
+          "/api/upload-photo",
+          filename,
+          base64Data,
+          `Uploading Image ${i + 1} of ${files.length}...`
+        );
+
+        if (data && data.success) {
+          successCount++;
+          const galleryTextArea = document.getElementById("form-gallery");
+          const currentVal = galleryTextArea.value.trim();
+          const separator = currentVal ? "\n" : "";
+          galleryTextArea.value = currentVal + separator + data.url;
+          this.renderGalleryPreviews();
+        } else {
+          this.showToast(`Failed to upload ${filename}`, "error");
+        }
+      } catch (err) {
+        console.error(`Gallery upload error for ${file.name}:`, err);
+        this.showToast(`Error uploading ${file.name || "file"}`, "error");
+      }
     }
-    this.showToast("Gallery upload session complete.", "success");
+
+    if (statusLabel) {
+      statusLabel.innerText = `Uploaded ${successCount} of ${files.length} images`;
+      statusLabel.style.color = successCount > 0 ? "#4caf50" : "var(--text-muted)";
+    }
+    this.showToast("Gallery upload session complete.", "info");
+    input.value = "";
   }
 
   async handleHeroBgSourceUpload(input) {
     if (!input.files || input.files.length === 0) return;
-    
+
     const file = input.files[0];
     const statusLabel = document.getElementById("upload-hero-bg-status");
 
+    const isVideo = file.type.startsWith("video/") || /\.mp4$/i.test(file.name || "");
+    const maxBytes = isVideo ? this.maxVideoFileBytes : this.maxImageFileBytes;
+    const sizeLabel = isVideo ? "Video" : "Image";
+
+    if (!this.validateFileSize(file, maxBytes, sizeLabel)) {
+      if (statusLabel) statusLabel.innerText = "Error: File too large";
+      input.value = "";
+      return;
+    }
+
     if (statusLabel) statusLabel.innerText = "Reading file...";
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64Data = reader.result.split(',')[1];
-        if (statusLabel) statusLabel.innerText = "Uploading...";
+    try {
+      const { filename, base64Data } = await this.readFileAsBase64(file);
+      if (statusLabel) statusLabel.innerText = "Uploading...";
 
-        const isVideo = file.type.startsWith("video/") || file.name.endsWith(".mp4");
-        const endpoint = isVideo ? '/api/upload-video' : '/api/upload-photo';
+      const endpoint = isVideo ? "/api/upload-video" : "/api/upload-photo";
+      const titleStr = isVideo ? "Uploading Landing Video..." : "Uploading Landing Image...";
 
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: this.getAuthHeaders(),
-          body: JSON.stringify({ filename: file.name, base64Data })
-        });
+      const data = await this.uploadWithProgress(endpoint, filename, base64Data, titleStr);
 
-        const data = await response.json();
+      if (data && data.success) {
+        this.showToast("Hero background media uploaded!", "success");
+        const urlInput = document.getElementById("hero-bg-source");
+        if (urlInput) urlInput.value = data.url;
 
-        if (response.ok && data.success) {
-          this.showToast("Hero background media uploaded!", "success");
-          
-          const urlInput = document.getElementById("hero-bg-source");
-          if (urlInput) urlInput.value = data.url;
-
-          const bgTypeSel = document.getElementById("hero-bg-type");
-          if (bgTypeSel) {
-            bgTypeSel.value = isVideo ? "video" : "image";
-            this.handleHeroBgTypeChange();
-          }
-
-          if (statusLabel) statusLabel.innerText = `Uploaded: ${file.name}`;
-        } else {
-          this.showToast(data.message || "Upload failed.", "error");
-          if (statusLabel) statusLabel.innerText = "Upload failed";
+        const bgTypeSel = document.getElementById("hero-bg-type");
+        if (bgTypeSel) {
+          bgTypeSel.value = isVideo ? "video" : "image";
+          this.handleHeroBgTypeChange();
         }
-      } catch (err) {
-        console.error("Hero background upload error:", err);
-        this.showToast("Failed to upload background media.", "error");
+
+        if (statusLabel) statusLabel.innerText = `Uploaded: ${filename}`;
+      } else {
+        this.showToast(data.message || "Upload failed.", "error");
         if (statusLabel) statusLabel.innerText = "Upload failed";
       }
-    };
+    } catch (err) {
+      console.error("Hero background upload error:", err);
+      this.showToast(err.message || "Failed to upload background media.", "error");
+      if (statusLabel) statusLabel.innerText = "Upload failed";
+    }
 
-    reader.onerror = () => {
-      this.showToast("FileReader failed to process file.", "error");
-      if (statusLabel) statusLabel.innerText = "Read failed";
-    };
-
-    reader.readAsDataURL(file);
+    input.value = "";
   }
 
   /* ==========================================================================
@@ -678,56 +838,47 @@ class UrbanBuildsAdmin {
 
   async handleVideoUpload(input) {
     if (!input.files || input.files.length === 0) return;
-    
+
     const file = input.files[0];
     const statusLabel = document.getElementById("upload-video-status");
+    const isMp4 = file.type === "video/mp4" || /\.mp4$/i.test(file.name || "");
 
-    if (file.type !== "video/mp4") {
+    if (!isMp4) {
       this.showToast("Please upload H.264 widescreen standard MP4 format video files only.", "error");
       if (statusLabel) statusLabel.innerText = "Error: Invalid file format";
       return;
     }
 
+    if (!this.validateFileSize(file, this.maxVideoFileBytes, "Video")) {
+      if (statusLabel) statusLabel.innerText = "Error: File too large";
+      input.value = "";
+      return;
+    }
+
     if (statusLabel) statusLabel.innerText = "Reading file content...";
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64Data = reader.result.split(',')[1];
-        if (statusLabel) statusLabel.innerText = "Uploading to server...";
+    try {
+      const { filename, base64Data } = await this.readFileAsBase64(file);
+      if (statusLabel) statusLabel.innerText = "Uploading to server...";
 
-        const response = await fetch('/api/upload-video', {
-          method: 'POST',
-          headers: this.getAuthHeaders(),
-          body: JSON.stringify({ filename: file.name, base64Data })
-        });
+      const data = await this.uploadWithProgress("/api/upload-video", filename, base64Data, "Uploading Video Walkthrough...");
 
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          this.showToast("Video walkthrough uploaded successfully!", "success");
-          
-          const urlInput = document.getElementById("form-video-url");
-          if (urlInput) urlInput.value = data.url;
-
-          if (statusLabel) statusLabel.innerText = `Uploaded: ${file.name}`;
-        } else {
-          this.showToast(data.message || "Video upload failed.", "error");
-          if (statusLabel) statusLabel.innerText = "Upload failed";
-        }
-      } catch (err) {
-        console.error("Video reader save error:", err);
-        this.showToast("Failed to upload walkthrough video.", "error");
+      if (data && data.success) {
+        this.showToast("Video walkthrough uploaded successfully!", "success");
+        const urlInput = document.getElementById("form-video-url");
+        if (urlInput) urlInput.value = data.url;
+        if (statusLabel) statusLabel.innerText = `Uploaded: ${filename}`;
+      } else {
+        this.showToast(data.message || "Video upload failed.", "error");
         if (statusLabel) statusLabel.innerText = "Upload failed";
       }
-    };
+    } catch (err) {
+      console.error("Video upload error:", err);
+      this.showToast(err.message || "Failed to upload walkthrough video.", "error");
+      if (statusLabel) statusLabel.innerText = "Upload failed";
+    }
 
-    reader.onerror = () => {
-      this.showToast("FileReader failed to process video.", "error");
-      if (statusLabel) statusLabel.innerText = "Read failed";
-    };
-
-    reader.readAsDataURL(file);
+    input.value = "";
   }
 
   /* ==========================================================================
